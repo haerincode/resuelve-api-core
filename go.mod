@@ -1,7 +1,7 @@
 module github.com/QuantumNous/new-api
 
 // +heroku goVersion go1.18
-go 1.23
+go 1.25.1
 
 require (
 	github.com/Calcium-Ion/go-epay v0.0.4
@@ -164,7 +164,7 @@ require (
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.32.0
-	github.com/QuantumNous/new-api/relaykit v0.0.0-00010101000000-000000000000
+	github.com/QuantumNous/new-api/relaykit v0.0.0
 )
 
 replace github.com/QuantumNous/new-api/relaykit => ./relaykit

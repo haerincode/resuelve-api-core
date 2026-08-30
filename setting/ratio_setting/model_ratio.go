@@ -109,9 +109,6 @@ var defaultModelRatio = map[string]float64{
 	"gpt-5-nano":                                0.025,
 	"gpt-5-nano-2025-08-07":                     0.025,
 	"gpt-5.5":                                   2.5, // $5 / 1M tokens
-	"gpt-5.6-sol":                               250, // Resuelve-API override: $0.50 / 1M
-	"gpt-5.6-terra":                             70,  // Resuelve-API override: $0.14 / 1M
-	"gpt-5.6-luna":                              125, // Resuelve-API override: $0.25 / 1M
 	"gpt-3.5-turbo":                             0.25,
 	"gpt-3.5-turbo-0613":                        0.75,
 	"gpt-3.5-turbo-16k":                         1.5, // $0.003 / 1K tokens
