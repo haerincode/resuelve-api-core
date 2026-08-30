@@ -49,9 +49,9 @@ func main() {
 	startTime := time.Now()
 
 	// Set timezone to America/Santiago for Resuelve-API (Chile/LatAm platform)
-	location, err := time.LoadLocation("America/Santiago")
-	if err != nil {
-		common.SysLog("warning: failed to load America/Santiago timezone, using system default: " + err.Error())
+	location, tzErr := time.LoadLocation("America/Santiago")
+	if tzErr != nil {
+		common.SysLog("warning: failed to load America/Santiago timezone, using system default: " + tzErr.Error())
 	} else {
 		time.Local = location
 		common.SysLog("timezone set to America/Santiago")
@@ -62,7 +62,7 @@ func main() {
 	})
 	kitutil.SetSystemErrorLogging(common.SysError)
 
-	err = InitResources()
+	err := InitResources()
 	if err != nil {
 		common.FatalLog("failed to initialize resources: " + err.Error())
 		return
