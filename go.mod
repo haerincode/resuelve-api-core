@@ -164,7 +164,7 @@ require (
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.32.0
-	github.com/QuantumNous/new-api/relaykit v0.0.0
+	github.com/QuantumNous/new-api/relaykit v0.0.0-00010101000000-000000000000
 )
 
 replace github.com/QuantumNous/new-api/relaykit => ./relaykit
