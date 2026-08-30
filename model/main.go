@@ -136,8 +136,15 @@ func chooseDB(envName string, isLog bool) (*gorm.DB, common.DatabaseType, error)
 			return db, common.DatabaseTypeClickHouse, err
 		}
 		if strings.HasPrefix(dsn, "postgres://") || strings.HasPrefix(dsn, "postgresql://") {
-			// Use PostgreSQL
-			common.SysLog("using PostgreSQL as database")
+			// Use PostgreSQL with automatic SSL mode for cloud providers (Neon, Supabase, Render)
+			if !strings.Contains(dsn, "sslmode=") {
+				separator := "?"
+				if strings.Contains(dsn, "?") {
+					separator = "&"
+				}
+				dsn = dsn + separator + "sslmode=require"
+			}
+			common.SysLog("using PostgreSQL as database (SSL mode configured)")
 			db, err := gorm.Open(postgres.New(postgres.Config{
 				DSN:                  dsn,
 				PreferSimpleProtocol: true, // disables implicit prepared statement usage

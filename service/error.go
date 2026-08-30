@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/QuantumNous/new-api/common"
 	taskdto "github.com/QuantumNous/new-api/dto"
@@ -17,6 +18,53 @@ import (
 	"github.com/QuantumNous/new-api/relaykit/dto"
 	"github.com/QuantumNous/new-api/relaykit/types"
 )
+
+// sanitizeUpstreamError removes Chinese characters from upstream error messages
+// and replaces common Chinese error patterns with Spanish equivalents (Resuelve-API)
+func sanitizeUpstreamError(text string) string {
+	// Check if text contains Chinese characters
+	hasChinese := false
+	for _, r := range text {
+		if unicode.Is(unicode.Han, r) {
+			hasChinese = true
+			break
+		}
+	}
+
+	if !hasChinese {
+		return text
+	}
+
+	// Common Chinese error patterns from A6api and other upstream providers
+	chinesePatterns := map[string]string{
+		"上游服务暂时不可用":     "El servicio upstream está temporalmente no disponible",
+		"上游服务返回异常响应":    "El servicio upstream devolvió una respuesta anómala",
+		"网络链路异常":         "Error en la conexión de red",
+		"请求上游地址失败":       "Error al conectar con el servicio upstream",
+		"请稍后重试":          "Por favor, reintentar en breve",
+		"服务器繁忙":          "Servidor ocupado",
+		"配额不足":           "Cuota insuficiente",
+		"模型不存在":          "Modelo no encontrado",
+		"密钥无效":           "Clave de API inválida",
+		"请求频率过高":         "Límite de velocidad excedido",
+	}
+
+	// Replace known patterns
+	for chinese, spanish := range chinesePatterns {
+		if strings.Contains(text, chinese) {
+			text = strings.ReplaceAll(text, chinese, spanish)
+		}
+	}
+
+	// If still contains Chinese after replacements, return generic message
+	for _, r := range text {
+		if unicode.Is(unicode.Han, r) {
+			return "Error del servicio upstream. Por favor, reintentar o contactar soporte."
+		}
+	}
+
+	return text
+}
 
 func MidjourneyErrorWrapper(code int, desc string) *taskdto.MidjourneyResponse {
 	return &taskdto.MidjourneyResponse{
@@ -65,9 +113,11 @@ func ClaudeErrorWrapper(err error, code string, statusCode int) *dto.ClaudeError
 	if !strings.HasPrefix(lowerText, "get file base64 from url") {
 		if strings.Contains(lowerText, "post") || strings.Contains(lowerText, "dial") || strings.Contains(lowerText, "http") {
 			common.SysLog(fmt.Sprintf("error: %s", text))
-			text = "请求上游地址失败"
+			text = "Error al conectar con el servicio upstream"
 		}
 	}
+	// Sanitize Chinese characters from upstream errors (Resuelve-API)
+	text = sanitizeUpstreamError(text)
 	claudeError := types.ClaudeError{
 		Message: text,
 		Type:    "new_api_error",
@@ -117,6 +167,8 @@ func RelayErrorHandler(ctx context.Context, resp *http.Response, showBodyWhenFai
 		// General format error (OpenAI, Anthropic, Gemini, etc.)
 		oaiError := errResponse.TryToOpenAIError()
 		if oaiError != nil {
+			// Sanitize upstream error messages (Resuelve-API)
+			oaiError.Message = sanitizeUpstreamError(oaiError.Message)
 			newApiErr = types.WithOpenAIError(*oaiError, resp.StatusCode)
 			if showBodyWhenFail {
 				newApiErr.Err = buildErrWithBody(newApiErr.Error())
@@ -125,6 +177,8 @@ func RelayErrorHandler(ctx context.Context, resp *http.Response, showBodyWhenFai
 		}
 	}
 	message := errResponse.ToMessage()
+	// Sanitize upstream error messages (Resuelve-API)
+	message = sanitizeUpstreamError(message)
 	if message == "" {
 		// The body parsed as JSON but carried no usable error message; log the
 		// raw body so the upstream failure remains diagnosable.
