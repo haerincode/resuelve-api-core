@@ -4007,7 +4007,7 @@
     "running": "ejecutando",
     "Running": "Ejecutando",
     "Runtime": "Runtime",
-    "Runway": "Runway",
+    "Runway": "Autonomía",
     "s": "s",
     "Safety Settings": "Configuración de Seguridad",
     "Same as Local": "Igual que Local",
@@ -4962,7 +4962,7 @@
     "Upstream URL": "URL upstream",
     "Upstream URL must be a full URL": "La URL upstream debe ser una URL completa",
     "uptime": "uptime",
-    "Uptime": "Uptime",
+    "Uptime": "Tiempo activo",
     "Uptime (30d)": "Uptime (30d)",
     "Uptime (last 30 days)": "Uptime (últimos 30 días)",
     "Uptime Kuma": "Uptime Kuma",
@@ -5300,6 +5300,9 @@
     "Panel": "Panel",
     "Last active a few seconds ago": "Última actividad hace unos segundos",
     "Last used: Not used yet": "Último uso: Aún no usado",
-    "Search for a command to run...": "Busca un comando para ejecutar..."
+    "Search for a command to run...": "Busca un comando para ejecutar...",
+    "Consumed in the last 24 hours (USD)": "Consumido en las últimas 24 horas (USD)",
+    "Total consumed (USD)": "Total consumido (USD)",
+    "Max Retries: 2": "Reintentos Máx: 2"
   }
 }
