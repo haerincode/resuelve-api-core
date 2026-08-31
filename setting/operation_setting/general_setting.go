@@ -24,7 +24,7 @@ type GeneralSetting struct {
 
 // 默认配置
 var generalSetting = GeneralSetting{
-	DocsLink:                   "https://docs.newapi.pro",
+	DocsLink:                   "https://app.notion.so/Gu-a-b-sica-de-instalaci-n-3c9419e6bf3c8002b302eff6923274b6",
 	PingIntervalEnabled:        true,
 	PingIntervalSeconds:        60,
 	QuotaDisplayType:           QuotaDisplayTypeUSD,
