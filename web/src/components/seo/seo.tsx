@@ -15,14 +15,14 @@ interface SEOProps {
 }
 
 export function SEO({
-  title = 'Resuelve-API | APIs de Claude y GPT en Pesos y USDT (77% OFF)',
-  description = 'Usa Claude Sonnet 5, Opus y GPT-5.6 en Cursor y Cline pagando en CLP con Webpay o USDT. Sin suscripciones fijas. Hasta 77% de ahorro con prompt caching.',
+  title = 'Resuelve-API | Claude Opus 5, Sonnet 5 y GPT-5.6 en Pesos y USDT (77% OFF)',
+  description = 'Usa Claude Opus 5, Sonnet 5 y GPT-5.6 Plus en Cursor y Cline pagando en CLP con Webpay o USDT. Sin suscripciones fijas. Hasta 77% de ahorro con prompt caching.',
   canonical,
   ogType = 'website',
   ogImage = 'https://resuelve-api.lat/og-image.jpg',
   noindex = false,
   schema,
-  keywords = 'claude barato, api openai chile, cursor precio, gpt-4 chile, claude sonnet chile, api anthropic latam, webpay api ia, usdt claude',
+  keywords = 'claude opus 5 barato, claude sonnet 5 chile, gpt-5.6 plus precio, api openai chile, cursor claude precio, anthropic chile, webpay api ia, usdt claude',
 }: SEOProps) {
   const baseUrl = 'https://resuelve-api.lat'
   const fullCanonical = canonical ? `${baseUrl}${canonical}` : baseUrl
@@ -68,8 +68,8 @@ export function SEO({
         },
         featureList: [
           'Compatible con OpenAI API',
-          'Soporte Claude Sonnet 5 y Opus',
-          'GPT-5.6 Sol y Terra',
+          'Soporte Claude Opus 5 y Sonnet 5',
+          'GPT-5.6 Plus, Sol y Terra',
           'Prompt Caching',
           'Pagos en CLP y USDT',
         ],

@@ -50,11 +50,11 @@ function CursorGuide() {
   return (
     <PublicLayout>
       <SEO
-        title='Cómo Usar Claude Sonnet 5 en Cursor (77% OFF) | Guía 2026'
-        description='Configura Claude Sonnet 5 y Opus en Cursor en 1 minuto. Ahorra hasta 77% vs API oficial. Paga en pesos chilenos con Webpay o USDT. Guía paso a paso actualizada.'
+        title='Cómo Usar Claude Opus 5 y Sonnet 5 en Cursor (77% OFF) | Guía 2026'
+        description='Configura Claude Opus 5, Sonnet 5 y GPT-5.6 Plus en Cursor en 1 minuto. Ahorra hasta 77% vs API oficial. Paga en pesos chilenos con Webpay o USDT. Guía paso a paso.'
         canonical='/docs/cursor'
         schema={faqSchema}
-        keywords='cursor claude barato, como usar claude en cursor, cursor api economica, claude sonnet cursor chile, prompt caching cursor'
+        keywords='cursor claude opus 5, cursor sonnet 5 barato, como usar claude en cursor, gpt-5.6 plus cursor, cursor api economica chile, prompt caching cursor'
       />
 
       <div className='container mx-auto max-w-4xl px-4 py-16'>
@@ -65,7 +65,7 @@ function CursorGuide() {
             Guía Oficial
           </div>
           <h1 className='mb-4 text-4xl font-bold tracking-tight md:text-5xl'>
-            Configurar Claude Sonnet 5 en Cursor
+            Configurar Claude Opus 5 y Sonnet 5 en Cursor
           </h1>
           <p className='text-muted-foreground text-lg'>
             Ahorra hasta <strong>77% en tus costos de IA</strong> usando Resuelve-API como

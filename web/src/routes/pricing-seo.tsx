@@ -111,11 +111,11 @@ function PricingSEO() {
   return (
     <PublicLayout>
       <SEO
-        title='Precios API Claude Sonnet 5 y GPT-5.6 Chile | 77% OFF'
-        description='Tabla de precios oficial Resuelve-API: Claude Sonnet 5 desde $0.70, Opus $1.75, GPT-5.6 desde $0.14 por millón de tokens. Paga en CLP con Webpay o USDT.'
+        title='Precios API Claude Opus 5, Sonnet 5 y GPT-5.6 Chile | 77% OFF'
+        description='Tabla de precios oficial Resuelve-API: Claude Opus 5 $1.75, Sonnet 5 $0.70, GPT-5.6 Plus desde $0.50 por millón de tokens. Paga en CLP con Webpay o USDT.'
         canonical='/pricing'
         schema={pricingSchema}
-        keywords='precio api claude chile, costo gpt-5.6, claude sonnet precio, api anthropic barata, cursor precio token'
+        keywords='precio api claude opus 5, costo claude sonnet 5, gpt-5.6 plus precio, api anthropic barata, cursor precio token'
       />
 
       <div className='container mx-auto max-w-6xl px-4 py-16'>
@@ -126,7 +126,7 @@ function PricingSEO() {
           </h1>
           <p className='text-muted-foreground mx-auto max-w-2xl text-lg'>
             Paga solo por lo que usas. Hasta <strong>77% más barato</strong> que los precios
-            oficiales. Sin suscripciones mensuales.
+            oficiales de Anthropic y OpenAI. Sin suscripciones mensuales.
           </p>
           <div className='mt-6 flex flex-wrap items-center justify-center gap-3 text-sm'>
             <div className='flex items-center gap-2'>

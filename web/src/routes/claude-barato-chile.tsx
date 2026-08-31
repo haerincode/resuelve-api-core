@@ -39,11 +39,11 @@ function ClaudeBaratoChile() {
   return (
     <PublicLayout>
       <SEO
-        title='Claude Sonnet 5 Barato Chile | API desde $0.70 USD con Webpay'
-        description='Compra API de Claude Sonnet 5 y Opus en Chile con 77% descuento. Paga en pesos con Webpay, Cuenta RUT o USDT. Ideal para Cursor, Cline y desarrollo con IA.'
+        title='Claude Opus 5 y Sonnet 5 Barato Chile | API desde $0.70 con Webpay'
+        description='Compra API de Claude Opus 5 y Sonnet 5 en Chile con 77% descuento. Paga en pesos con Webpay, Cuenta RUT o USDT. Ideal para Cursor, Cline y desarrollo con IA.'
         canonical='/claude-barato-chile'
         schema={schema}
-        keywords='claude barato chile, api claude sonnet precio chile, comprar claude webpay, claude pesos chilenos, anthropic chile'
+        keywords='claude opus 5 barato, claude sonnet 5 chile, api claude precio chile, comprar claude webpay, claude pesos chilenos, anthropic chile'
       />
 
       <div className='container mx-auto max-w-6xl px-4 py-16'>
@@ -54,12 +54,12 @@ function ClaudeBaratoChile() {
             77% más barato
           </div>
           <h1 className='mb-4 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl'>
-            Claude Sonnet 5 Barato
+            Claude Opus 5 y Sonnet 5 Barato
             <br />
             <span className='text-primary'>en Chile 🇨🇱</span>
           </h1>
           <p className='text-muted-foreground mb-6 max-w-3xl text-lg md:text-xl'>
-            Accede a <strong>Claude Sonnet 5, Opus y todos los modelos de Anthropic</strong> con
+            Accede a <strong>Claude Opus 5, Sonnet 5 y todos los modelos de Anthropic</strong> con
             hasta 77% de descuento. Paga en pesos chilenos con Webpay, Cuenta RUT o USDT.
           </p>
           <div className='flex flex-wrap gap-3'>

@@ -65,11 +65,11 @@ function CursorAPIEconomica() {
   return (
     <PublicLayout>
       <SEO
-        title='API Económica para Cursor Chile | Ahorra 77% en Claude Sonnet'
-        description='Reduce costos de Cursor hasta 77%. API de Claude Sonnet 5 desde $0.70 por millón. Paga en pesos con Webpay. Compatible con Cursor, Cline y VS Code.'
+        title='API Económica para Cursor Chile | Ahorra 77% en Claude Opus 5'
+        description='Reduce costos de Cursor hasta 77%. API de Claude Opus 5 y Sonnet 5 desde $0.70 por millón. Paga en pesos con Webpay. Compatible con Cursor, Cline y VS Code.'
         canonical='/cursor-api-economica'
         schema={schema}
-        keywords='cursor api barata, cursor claude economico, api cursor chile, reducir costo cursor, cursor webpay'
+        keywords='cursor api barata, cursor claude opus economico, api cursor chile, reducir costo cursor, cursor webpay, gpt-5.6 plus cursor'
       />
 
       <div className='container mx-auto max-w-6xl px-4 py-16'>
@@ -83,7 +83,7 @@ function CursorAPIEconomica() {
             API Económica para Cursor
           </h1>
           <p className='text-muted-foreground mx-auto mb-6 max-w-3xl text-lg md:text-xl'>
-            Usa <strong>Claude Sonnet 5 y Opus en Cursor</strong> pagando hasta{' '}
+            Usa <strong>Claude Opus 5, Sonnet 5 y GPT-5.6 Plus en Cursor</strong> pagando hasta{' '}
             <strong>77% menos</strong>. Compatible 100%, configura en 1 minuto.
           </p>
           <div className='flex flex-wrap justify-center gap-3'>
