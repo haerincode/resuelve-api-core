@@ -94,6 +94,7 @@ function RootComponent() {
 
   return (
     <ThemeCustomizationProvider>
+      <Analytics gaId={import.meta.env.VITE_GA_ID} gtmId={import.meta.env.VITE_GTM_ID} />
       <NavigationProgress />
       <Outlet />
       <Toaster closeButton duration={5000} position='top-center' richColors />

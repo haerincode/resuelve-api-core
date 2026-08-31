@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next'
 import { PublicLayout } from '@/components/layout'
 import { Footer } from '@/components/layout/components/footer'
 import { RichContent } from '@/components/rich-content'
+import { SEO } from '@/components/seo'
 import { useTheme } from '@/context/theme-provider'
 import { isLikelyHtml } from '@/lib/content-format'
 import { useAuthStore } from '@/stores/auth-store'
@@ -122,6 +123,7 @@ export function Home() {
 
   return (
     <PublicLayout showMainContainer={false}>
+      <SEO />
       <Hero isAuthenticated={isAuthenticated} />
       <Stats />
       <Features />
