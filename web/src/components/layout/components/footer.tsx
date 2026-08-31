@@ -292,15 +292,27 @@ export function Footer(props: FooterProps) {
 
         {/* Copyright + optional legal links inline on the left, project
             attribution on the right; wraps on narrow screens. */}
-        <div className='border-border/30 mt-12 flex flex-col items-center justify-between gap-x-3 gap-y-2 border-t pt-6 sm:flex-row'>
-          <div className='text-muted-foreground/40 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs sm:justify-start'>
-            <span>
-              &copy; {currentYear} {displayName}.{' '}
-              {props.copyright ?? t('footer.defaultCopyright')}
-            </span>
-            <LegalLinks leadingSeparator />
+        <div className='border-border/30 mt-12 border-t pt-6'>
+          {/* Legal Disclaimer */}
+          <div className='bg-muted/30 mb-6 rounded-lg border p-4'>
+            <h4 className='text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wide'>
+              {t('footer.legal.title')}
+            </h4>
+            <p className='text-muted-foreground/70 text-xs leading-relaxed'>
+              {t('footer.legal.disclaimer')}
+            </p>
           </div>
-          <ProjectAttribution currentYear={currentYear} />
+
+          <div className='flex flex-col items-center justify-between gap-x-3 gap-y-2 sm:flex-row'>
+            <div className='text-muted-foreground/40 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs sm:justify-start'>
+              <span>
+                &copy; {currentYear} {displayName}.{' '}
+                {props.copyright ?? t('footer.defaultCopyright')}
+              </span>
+              <LegalLinks leadingSeparator />
+            </div>
+            <ProjectAttribution currentYear={currentYear} />
+          </div>
         </div>
       </div>
     </footer>
