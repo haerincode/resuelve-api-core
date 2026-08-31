@@ -12,7 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as authRouteRouteImport } from './routes/(auth)/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as ClaudeBaratoChileRouteImport } from './routes/claude-barato-chile'
+import { Route as CursorApiEconomicaRouteImport } from './routes/cursor-api-economica'
+import { Route as PricingSeoRouteImport } from './routes/pricing-seo'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as SitemapRouteImport } from './routes/sitemap'
 import { Route as UserAgreementRouteImport } from './routes/user-agreement'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as authOauthRouteImport } from './routes/(auth)/oauth'
@@ -29,6 +33,13 @@ import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as AuthenticatedChat2linkRouteImport } from './routes/_authenticated/chat2link'
 import { Route as AuthenticatedSystemSettingsRouteRouteImport } from './routes/_authenticated/system-settings/route'
 import { Route as AboutIndexRouteImport } from './routes/about/index'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as BlogClaudeOpus5VsSonnet5CualElegirRouteImport } from './routes/blog/claude-opus-5-vs-sonnet-5-cual-elegir'
+import { Route as BlogComoAhorre500DolaresAlMesEnApisDeIaRouteImport } from './routes/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia'
+import { Route as BlogCursorVsGithubCopilot2026RouteImport } from './routes/blog/cursor-vs-github-copilot-2026'
+import { Route as BlogWebpayVsTarjetaInternacionalPagarApisIaRouteImport } from './routes/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia'
+import { Route as DocsIndexRouteImport } from './routes/docs/index'
+import { Route as DocsCursorRouteImport } from './routes/docs/cursor'
 import { Route as OauthProviderRouteImport } from './routes/oauth/$provider'
 import { Route as PricingIndexRouteImport } from './routes/pricing/index'
 import { Route as RankingsIndexRouteImport } from './routes/rankings/index'
@@ -81,9 +92,29 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClaudeBaratoChileRoute = ClaudeBaratoChileRouteImport.update({
+  id: '/claude-barato-chile',
+  path: '/claude-barato-chile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CursorApiEconomicaRoute = CursorApiEconomicaRouteImport.update({
+  id: '/cursor-api-economica',
+  path: '/cursor-api-economica',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingSeoRoute = PricingSeoRouteImport.update({
+  id: '/pricing-seo',
+  path: '/pricing-seo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
   id: '/privacy-policy',
   path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapRoute = SitemapRouteImport.update({
+  id: '/sitemap',
+  path: '/sitemap',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UserAgreementRoute = UserAgreementRouteImport.update({
@@ -165,6 +196,45 @@ const AuthenticatedSystemSettingsRouteRoute =
 const AboutIndexRoute = AboutIndexRouteImport.update({
   id: '/about/',
   path: '/about/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogClaudeOpus5VsSonnet5CualElegirRoute =
+  BlogClaudeOpus5VsSonnet5CualElegirRouteImport.update({
+    id: '/blog/claude-opus-5-vs-sonnet-5-cual-elegir',
+    path: '/blog/claude-opus-5-vs-sonnet-5-cual-elegir',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogComoAhorre500DolaresAlMesEnApisDeIaRoute =
+  BlogComoAhorre500DolaresAlMesEnApisDeIaRouteImport.update({
+    id: '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia',
+    path: '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogCursorVsGithubCopilot2026Route =
+  BlogCursorVsGithubCopilot2026RouteImport.update({
+    id: '/blog/cursor-vs-github-copilot-2026',
+    path: '/blog/cursor-vs-github-copilot-2026',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogWebpayVsTarjetaInternacionalPagarApisIaRoute =
+  BlogWebpayVsTarjetaInternacionalPagarApisIaRouteImport.update({
+    id: '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia',
+    path: '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DocsIndexRoute = DocsIndexRouteImport.update({
+  id: '/docs/',
+  path: '/docs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsCursorRoute = DocsCursorRouteImport.update({
+  id: '/docs/cursor',
+  path: '/docs/cursor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OauthProviderRoute = OauthProviderRouteImport.update({
@@ -389,7 +459,11 @@ const AuthenticatedSystemSettingsSiteSectionRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/claude-barato-chile': typeof ClaudeBaratoChileRoute
+  '/cursor-api-economica': typeof CursorApiEconomicaRoute
+  '/pricing-seo': typeof PricingSeoRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/sitemap': typeof SitemapRoute
   '/user-agreement': typeof UserAgreementRoute
   '/system-settings': typeof AuthenticatedSystemSettingsRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
@@ -405,8 +479,15 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/chat2link': typeof AuthenticatedChat2linkRoute
+  '/blog/claude-opus-5-vs-sonnet-5-cual-elegir': typeof BlogClaudeOpus5VsSonnet5CualElegirRoute
+  '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia': typeof BlogComoAhorre500DolaresAlMesEnApisDeIaRoute
+  '/blog/cursor-vs-github-copilot-2026': typeof BlogCursorVsGithubCopilot2026Route
+  '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia': typeof BlogWebpayVsTarjetaInternacionalPagarApisIaRoute
+  '/docs/cursor': typeof DocsCursorRoute
   '/oauth/$provider': typeof OauthProviderRoute
   '/about/': typeof AboutIndexRoute
+  '/blog/': typeof BlogIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/pricing/': typeof PricingIndexRoute
   '/rankings/': typeof RankingsIndexRoute
   '/setup/': typeof SetupIndexRoute
@@ -447,7 +528,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/claude-barato-chile': typeof ClaudeBaratoChileRoute
+  '/cursor-api-economica': typeof CursorApiEconomicaRoute
+  '/pricing-seo': typeof PricingSeoRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/sitemap': typeof SitemapRoute
   '/user-agreement': typeof UserAgreementRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/oauth': typeof authOauthRoute
@@ -462,8 +547,15 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/chat2link': typeof AuthenticatedChat2linkRoute
+  '/blog/claude-opus-5-vs-sonnet-5-cual-elegir': typeof BlogClaudeOpus5VsSonnet5CualElegirRoute
+  '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia': typeof BlogComoAhorre500DolaresAlMesEnApisDeIaRoute
+  '/blog/cursor-vs-github-copilot-2026': typeof BlogCursorVsGithubCopilot2026Route
+  '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia': typeof BlogWebpayVsTarjetaInternacionalPagarApisIaRoute
+  '/docs/cursor': typeof DocsCursorRoute
   '/oauth/$provider': typeof OauthProviderRoute
   '/about': typeof AboutIndexRoute
+  '/blog': typeof BlogIndexRoute
+  '/docs': typeof DocsIndexRoute
   '/pricing': typeof PricingIndexRoute
   '/rankings': typeof RankingsIndexRoute
   '/setup': typeof SetupIndexRoute
@@ -507,7 +599,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(auth)': typeof authRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/claude-barato-chile': typeof ClaudeBaratoChileRoute
+  '/cursor-api-economica': typeof CursorApiEconomicaRoute
+  '/pricing-seo': typeof PricingSeoRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/sitemap': typeof SitemapRoute
   '/user-agreement': typeof UserAgreementRoute
   '/_authenticated/system-settings': typeof AuthenticatedSystemSettingsRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
@@ -523,8 +619,15 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/chat2link': typeof AuthenticatedChat2linkRoute
+  '/blog/claude-opus-5-vs-sonnet-5-cual-elegir': typeof BlogClaudeOpus5VsSonnet5CualElegirRoute
+  '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia': typeof BlogComoAhorre500DolaresAlMesEnApisDeIaRoute
+  '/blog/cursor-vs-github-copilot-2026': typeof BlogCursorVsGithubCopilot2026Route
+  '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia': typeof BlogWebpayVsTarjetaInternacionalPagarApisIaRoute
+  '/docs/cursor': typeof DocsCursorRoute
   '/oauth/$provider': typeof OauthProviderRoute
   '/about/': typeof AboutIndexRoute
+  '/blog/': typeof BlogIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/pricing/': typeof PricingIndexRoute
   '/rankings/': typeof RankingsIndexRoute
   '/setup/': typeof SetupIndexRoute
@@ -567,7 +670,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/claude-barato-chile'
+    | '/cursor-api-economica'
+    | '/pricing-seo'
     | '/privacy-policy'
+    | '/sitemap'
     | '/user-agreement'
     | '/system-settings'
     | '/forgot-password'
@@ -583,8 +690,15 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/chat2link'
+    | '/blog/claude-opus-5-vs-sonnet-5-cual-elegir'
+    | '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia'
+    | '/blog/cursor-vs-github-copilot-2026'
+    | '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia'
+    | '/docs/cursor'
     | '/oauth/$provider'
     | '/about/'
+    | '/blog/'
+    | '/docs/'
     | '/pricing/'
     | '/rankings/'
     | '/setup/'
@@ -625,7 +739,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/claude-barato-chile'
+    | '/cursor-api-economica'
+    | '/pricing-seo'
     | '/privacy-policy'
+    | '/sitemap'
     | '/user-agreement'
     | '/forgot-password'
     | '/oauth'
@@ -640,8 +758,15 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/chat2link'
+    | '/blog/claude-opus-5-vs-sonnet-5-cual-elegir'
+    | '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia'
+    | '/blog/cursor-vs-github-copilot-2026'
+    | '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia'
+    | '/docs/cursor'
     | '/oauth/$provider'
     | '/about'
+    | '/blog'
+    | '/docs'
     | '/pricing'
     | '/rankings'
     | '/setup'
@@ -684,7 +809,11 @@ export interface FileRouteTypes {
     | '/'
     | '/(auth)'
     | '/_authenticated'
+    | '/claude-barato-chile'
+    | '/cursor-api-economica'
+    | '/pricing-seo'
     | '/privacy-policy'
+    | '/sitemap'
     | '/user-agreement'
     | '/_authenticated/system-settings'
     | '/(auth)/forgot-password'
@@ -700,8 +829,15 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/chat2link'
+    | '/blog/claude-opus-5-vs-sonnet-5-cual-elegir'
+    | '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia'
+    | '/blog/cursor-vs-github-copilot-2026'
+    | '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia'
+    | '/docs/cursor'
     | '/oauth/$provider'
     | '/about/'
+    | '/blog/'
+    | '/docs/'
     | '/pricing/'
     | '/rankings/'
     | '/setup/'
@@ -745,15 +881,26 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   authRouteRoute: typeof authRouteRouteWithChildren
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ClaudeBaratoChileRoute: typeof ClaudeBaratoChileRoute
+  CursorApiEconomicaRoute: typeof CursorApiEconomicaRoute
+  PricingSeoRoute: typeof PricingSeoRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  SitemapRoute: typeof SitemapRoute
   UserAgreementRoute: typeof UserAgreementRoute
   errors401Route: typeof errors401Route
   errors403Route: typeof errors403Route
   errors404Route: typeof errors404Route
   errors500Route: typeof errors500Route
   errors503Route: typeof errors503Route
+  BlogClaudeOpus5VsSonnet5CualElegirRoute: typeof BlogClaudeOpus5VsSonnet5CualElegirRoute
+  BlogComoAhorre500DolaresAlMesEnApisDeIaRoute: typeof BlogComoAhorre500DolaresAlMesEnApisDeIaRoute
+  BlogCursorVsGithubCopilot2026Route: typeof BlogCursorVsGithubCopilot2026Route
+  BlogWebpayVsTarjetaInternacionalPagarApisIaRoute: typeof BlogWebpayVsTarjetaInternacionalPagarApisIaRoute
+  DocsCursorRoute: typeof DocsCursorRoute
   OauthProviderRoute: typeof OauthProviderRoute
   AboutIndexRoute: typeof AboutIndexRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+  DocsIndexRoute: typeof DocsIndexRoute
   PricingIndexRoute: typeof PricingIndexRoute
   RankingsIndexRoute: typeof RankingsIndexRoute
   SetupIndexRoute: typeof SetupIndexRoute
@@ -783,11 +930,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/claude-barato-chile': {
+      id: '/claude-barato-chile'
+      path: '/claude-barato-chile'
+      fullPath: '/claude-barato-chile'
+      preLoaderRoute: typeof ClaudeBaratoChileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cursor-api-economica': {
+      id: '/cursor-api-economica'
+      path: '/cursor-api-economica'
+      fullPath: '/cursor-api-economica'
+      preLoaderRoute: typeof CursorApiEconomicaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing-seo': {
+      id: '/pricing-seo'
+      path: '/pricing-seo'
+      fullPath: '/pricing-seo'
+      preLoaderRoute: typeof PricingSeoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy-policy': {
       id: '/privacy-policy'
       path: '/privacy-policy'
       fullPath: '/privacy-policy'
       preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap': {
+      id: '/sitemap'
+      path: '/sitemap'
+      fullPath: '/sitemap'
+      preLoaderRoute: typeof SitemapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/user-agreement': {
@@ -900,6 +1075,55 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about/'
       preLoaderRoute: typeof AboutIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/claude-opus-5-vs-sonnet-5-cual-elegir': {
+      id: '/blog/claude-opus-5-vs-sonnet-5-cual-elegir'
+      path: '/blog/claude-opus-5-vs-sonnet-5-cual-elegir'
+      fullPath: '/blog/claude-opus-5-vs-sonnet-5-cual-elegir'
+      preLoaderRoute: typeof BlogClaudeOpus5VsSonnet5CualElegirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia': {
+      id: '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia'
+      path: '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia'
+      fullPath: '/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia'
+      preLoaderRoute: typeof BlogComoAhorre500DolaresAlMesEnApisDeIaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/cursor-vs-github-copilot-2026': {
+      id: '/blog/cursor-vs-github-copilot-2026'
+      path: '/blog/cursor-vs-github-copilot-2026'
+      fullPath: '/blog/cursor-vs-github-copilot-2026'
+      preLoaderRoute: typeof BlogCursorVsGithubCopilot2026RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia': {
+      id: '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia'
+      path: '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia'
+      fullPath: '/blog/webpay-vs-tarjeta-internacional-pagar-apis-ia'
+      preLoaderRoute: typeof BlogWebpayVsTarjetaInternacionalPagarApisIaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/': {
+      id: '/docs/'
+      path: '/docs'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof DocsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/cursor': {
+      id: '/docs/cursor'
+      path: '/docs/cursor'
+      fullPath: '/docs/cursor'
+      preLoaderRoute: typeof DocsCursorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oauth/$provider': {
@@ -1307,15 +1531,29 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   authRouteRoute: authRouteRouteWithChildren,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ClaudeBaratoChileRoute: ClaudeBaratoChileRoute,
+  CursorApiEconomicaRoute: CursorApiEconomicaRoute,
+  PricingSeoRoute: PricingSeoRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
+  SitemapRoute: SitemapRoute,
   UserAgreementRoute: UserAgreementRoute,
   errors401Route: errors401Route,
   errors403Route: errors403Route,
   errors404Route: errors404Route,
   errors500Route: errors500Route,
   errors503Route: errors503Route,
+  BlogClaudeOpus5VsSonnet5CualElegirRoute:
+    BlogClaudeOpus5VsSonnet5CualElegirRoute,
+  BlogComoAhorre500DolaresAlMesEnApisDeIaRoute:
+    BlogComoAhorre500DolaresAlMesEnApisDeIaRoute,
+  BlogCursorVsGithubCopilot2026Route: BlogCursorVsGithubCopilot2026Route,
+  BlogWebpayVsTarjetaInternacionalPagarApisIaRoute:
+    BlogWebpayVsTarjetaInternacionalPagarApisIaRoute,
+  DocsCursorRoute: DocsCursorRoute,
   OauthProviderRoute: OauthProviderRoute,
   AboutIndexRoute: AboutIndexRoute,
+  BlogIndexRoute: BlogIndexRoute,
+  DocsIndexRoute: DocsIndexRoute,
   PricingIndexRoute: PricingIndexRoute,
   RankingsIndexRoute: RankingsIndexRoute,
   SetupIndexRoute: SetupIndexRoute,

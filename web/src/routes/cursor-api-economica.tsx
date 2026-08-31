@@ -27,7 +27,7 @@ function CursorAPIEconomica() {
       },
       {
         '@type': 'HowToStep',
-        name': 'Generar API Key',
+        name: 'Generar API Key',
         text: 'Obtén tu clave API desde el panel',
       },
       {
