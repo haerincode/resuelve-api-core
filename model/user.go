@@ -993,8 +993,11 @@ func (user *User) ValidateAndFill() (err error) {
 	if username == "" || password == "" {
 		return ErrUserEmptyCredentials
 	}
-	// find by username or email
-	err = DB.Where("username = ? OR email = ?", username, username).First(user).Error
+	// Find by username or email. Usernames are matched case-sensitively, but
+	// emails are stored normalized (see NormalizeEmail), so the email branch has
+	// to compare case-insensitively or someone who registered as User@Host.com
+	// could never sign in with the address they typed.
+	err = DB.Where("username = ? OR LOWER(email) = ?", username, NormalizeEmail(username)).First(user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrInvalidCredentials

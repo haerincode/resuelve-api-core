@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import axios, { type AxiosRequestConfig } from 'axios'
-import { t } from 'i18next'
+import i18next, { t } from 'i18next'
 import { toast } from 'sonner'
 
 import {
@@ -47,6 +47,20 @@ export const api = axios.create({
   headers: {
     'Cache-Control': 'no-store',
   },
+})
+
+// The backend resolves the language for its error messages from the user's saved
+// setting, then falls back to Accept-Language. Anonymous requests (sign-in,
+// registration, password reset) have no saved setting, so without this the
+// browser's own Accept-Language decides and a user who picked Spanish in the
+// language switcher still gets English errors. Send the active UI language so
+// server-side messages always match what the user is reading.
+api.interceptors.request.use((config) => {
+  const language = i18next.resolvedLanguage || i18next.language
+  if (language) {
+    config.headers.set('Accept-Language', language)
+  }
+  return config
 })
 
 const inFlightGet = new Map<string, Promise<unknown>>()

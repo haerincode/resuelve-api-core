@@ -33,6 +33,7 @@ import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -372,6 +373,9 @@ export function UserAuthForm({
                       {...field}
                     />
                   </FormControl>
+                  <FormDescription>
+                    {t('Username, email, and password are case-sensitive.')}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

@@ -43,8 +43,11 @@ export function handleServerError(error: unknown) {
     errMsg = i18next.t('Content not found.')
   }
 
+  // The backend answers with {success, message}; `title` does not exist on any
+  // response, so reading it produced an `undefined` toast and swallowed the
+  // server's own explanation of what went wrong.
   if (error instanceof AxiosError) {
-    errMsg = error.response?.data.title
+    errMsg = error.response?.data?.message || error.message || errMsg
   }
 
   toast.error(errMsg)
