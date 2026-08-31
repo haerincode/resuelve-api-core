@@ -551,6 +551,12 @@ export const STATIC_I18N_KEYS = [
   'The model that was requested',
   'The upstream channel that served the requests',
 
+  // Auth terms footer (variant text and link labels passed to t at runtime)
+  'By clicking sign in, you agree to our',
+  'By creating an account, you agree to our',
+  'User Agreement',
+  'Privacy Policy',
+
   // Misc
   'Cancel',
   'Status',

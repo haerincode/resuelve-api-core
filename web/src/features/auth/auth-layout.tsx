@@ -76,29 +76,33 @@ export function AuthLayout({ children }: AuthLayoutProps) {
             {/* Badge */}
             <div className='inline-flex items-center rounded-full border bg-background/50 px-3 py-1 text-xs font-medium backdrop-blur-sm'>
               <span className='mr-1.5 h-1.5 w-1.5 rounded-full bg-primary animate-pulse' />
-              Infraestructura de IA para LatAm
+              {t('AI infrastructure for LatAm')}
             </div>
 
             {/* Heading */}
             <h2 className='text-4xl font-bold tracking-tight'>
-              Accede a modelos{' '}
-              <span className='text-primary'>de última generación</span>
+              {t('Access models')}{' '}
+              <span className='text-primary'>
+                {t('of the latest generation')}
+              </span>
             </h2>
 
             {/* Description */}
             <p className='text-muted-foreground text-lg leading-relaxed'>
-              Gateway unificado con enrutamiento inteligente, balanceo de carga y monitoreo en tiempo real.
+              {t(
+                'Unified gateway with intelligent routing, load balancing, and real-time monitoring.'
+              )}
             </p>
 
             {/* Features list */}
             <ul className='space-y-3 pt-4'>
               {[
-                'API compatible con OpenAI',
-                'Múltiples proveedores (OpenAI, Anthropic, Google)',
-                'Facturación y control de cuotas',
-                'Monitoreo de latencia y uptime',
-              ].map((feature, i) => (
-                <li key={i} className='flex items-start gap-3 text-sm'>
+                t('OpenAI-compatible API'),
+                t('Multiple providers (OpenAI, Anthropic, Google)'),
+                t('Billing and quota control'),
+                t('Latency and uptime monitoring'),
+              ].map((feature) => (
+                <li key={feature} className='flex items-start gap-3 text-sm'>
                   <svg
                     className='text-primary mt-0.5 h-5 w-5 flex-shrink-0'
                     fill='none'
@@ -121,7 +125,11 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           {/* Footer quote */}
           <div className='mt-auto pt-12'>
             <blockquote className='border-l-2 border-primary/50 pl-4 italic text-sm text-muted-foreground'>
-              "Infraestructura robusta para escalar tus aplicaciones de IA en Chile y Latinoamérica"
+              &ldquo;
+              {t(
+                'Robust infrastructure to scale your AI applications in Chile and Latin America'
+              )}
+              &rdquo;
             </blockquote>
           </div>
         </div>
