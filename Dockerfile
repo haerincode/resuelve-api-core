@@ -2,7 +2,7 @@ FROM oven/bun:1.4.0@sha256:5ff609364c049b54eb0ff560ec96319729a972078ef2c755d758f
 
 WORKDIR /build/web
 COPY web/package.json web/bun.lock ./
-RUN bun install --frozen-lockfile
+RUN bun install
 COPY ./web ./
 COPY ./VERSION /build/VERSION
 ENV NODE_OPTIONS="--max-old-space-size=4096"
