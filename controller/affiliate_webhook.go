@@ -1,86 +1,66 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/i18n"
-	"github.com/QuantumNous/new-api/logger"
 	"github.com/QuantumNous/new-api/model"
 	"github.com/gin-gonic/gin"
 )
 
-// TopupWebhook estructura para webhook de recargas
-type TopupWebhookPayload struct {
-	UserID  int `json:"user_id" binding:"required"`
-	Amount  int `json:"amount" binding:"required"`
-	TopupID int `json:"topup_id"`
+type TopupWebhookRequest struct {
+	UserID int     `json:"user_id" binding:"required"`
+	Amount float64 `json:"amount" binding:"required"`
 }
 
-// ProcessAffiliateCommission procesa comisión cuando usuario referido recarga
-func ProcessAffiliateCommission(c *gin.Context) {
-	var payload TopupWebhookPayload
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		common.ApiError(c, err)
+func HandleTopupWebhook(c *gin.Context) {
+	var req TopupWebhookRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Obtener usuario que recargó
-	user, err := model.GetUserById(payload.UserID, false)
+	// Get user
+	user, err := model.GetUserById(req.UserID, false)
 	if err != nil {
-		common.ApiError(c, err)
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
-	// Verificar si tiene inviter
+	// Check if user was referred
 	if user.InviterId == 0 {
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-			"message": "Usuario sin inviter",
-		})
+		c.JSON(http.StatusOK, gin.H{"message": "User not referred, no commission"})
 		return
 	}
 
-	// Calcular comisión (30%)
-	commissionRate := 0.30
-	commissionAmount := int(float64(payload.Amount) * commissionRate)
+	affiliateID := user.InviterId
 
-	if commissionAmount <= 0 {
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-			"message": "Comisión cero",
-		})
+	// Check if affiliate exists
+	var affiliate model.Affiliate
+	if err := model.DB.Where("id = ?", affiliateID).First(&affiliate).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Affiliate not found"})
 		return
 	}
 
-	// Actualizar stats del inviter
-	err = model.DB.Model(&model.User{}).
-		Where("id = ?", user.InviterId).
-		Updates(map[string]interface{}{
-			"aff_quota":         model.DB.Raw("aff_quota + ?", commissionAmount),
-			"aff_history_quota": model.DB.Raw("aff_history_quota + ?", commissionAmount),
-		}).Error
+	// Calculate 30% commission
+	commissionAmount := req.Amount * 0.30
 
-	if err != nil {
-		logger.SysLog(fmt.Sprintf("Error updating affiliate commission for inviter %d: %v", user.InviterId, err))
-		common.ApiError(c, err)
-		return
+	// Create commission record
+	commission := model.AffiliateCommission{
+		AffiliateID: affiliateID,
+		UserID:      req.UserID,
+		Amount:      commissionAmount,
+		TopupAmount: req.Amount,
+		Paid:        false,
 	}
 
-	// Insertar registro de comisión en tabla commissions si existe
-	// (tabla creada por affiliate_system.sql)
-	_, _ = model.DB.Exec(`
-		INSERT INTO commissions (user_id, inviter_id, amount, source_type, source_id, commission_rate, status, created_at)
-		VALUES (?, ?, ?, 'topup', ?, ?, 'pending', ?)
-	`, payload.UserID, user.InviterId, commissionAmount, payload.TopupID, commissionRate*100, common.GetTimestamp())
-
-	logger.SysLog(fmt.Sprintf("Affiliate commission processed: user=%d inviter=%d amount=%d topup=%d",
-		payload.UserID, user.InviterId, commissionAmount, payload.TopupID))
+	if err := model.DB.Create(&commission).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create commission"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success":           true,
-		"commission_amount": commissionAmount,
-		"inviter_id":        user.InviterId,
+		"message":     "Commission recorded",
+		"affiliate_id": affiliateID,
+		"amount":      commissionAmount,
 	})
 }

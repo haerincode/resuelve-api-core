@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Afiliados - Resuelve API</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0B0E14;
+            color: #F8FAFC;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header {
+            background: #1E293B;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+        }
+        .section {
+            background: #1E293B;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+        }
+        h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #F8FAFC;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+        }
+        th {
+            color: #94A3B8;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+        button {
+            background: #38BDF8;
+            color: #0B0E14;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            margin-right: 8px;
+        }
+        button:hover { background: #22D3EE; }
+        button.danger {
+            background: #EF4444;
+            color: #F8FAFC;
+        }
+        button.danger:hover { background: #DC2626; }
+        button.success {
+            background: #10B981;
+            color: #F8FAFC;
+        }
+        button.success:hover { background: #059669; }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge.pending {
+            background: #F59E0B;
+            color: #0B0E14;
+        }
+        .badge.paid {
+            background: #10B981;
+            color: #0B0E14;
+        }
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: #0F172A;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+        .stat-box .label {
+            color: #94A3B8;
+            font-size: 13px;
+        }
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #38BDF8;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Admin Panel - Afiliados</h1>
+            <p style="color: #94A3B8;">Gestión de comisiones y afiliados</p>
+        </div>
+
+        <div class="stats-summary" id="stats-summary"></div>
+
+        <div class="section">
+            <h2>Comisiones Pendientes</h2>
+            <button class="success" onclick="markSelectedAsPaid()">Marcar Seleccionados como Pagados</button>
+            <button onclick="exportPending()">Exportar CSV</button>
+            <table style="margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all" onchange="toggleAll(this)"></th>
+                        <th>ID</th>
+                        <th>Afiliado</th>
+                        <th>Email</th>
+                        <th>Wallet USDT</th>
+                        <th>Usuario</th>
+                        <th>Recarga</th>
+                        <th>Comisión</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody id="pending-body"></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Todos los Afiliados</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Código</th>
+                        <th>Email</th>
+                        <th>Nombre</th>
+                        <th>Telegram</th>
+                        <th>Wallet USDT</th>
+                        <th>Registrado</th>
+                    </tr>
+                </thead>
+                <tbody id="affiliates-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin + '/api/affiliate';
+        const token = localStorage.getItem('admin_token') || prompt('Admin token:');
+
+        if (token) {
+            localStorage.setItem('admin_token', token);
+            loadData();
+        }
+
+        async function loadData() {
+            await loadPendingCommissions();
+            await loadAffiliates();
+            calculateStats();
+        }
+
+        async function loadPendingCommissions() {
+            const res = await fetch(API_BASE + '/admin/commissions/pending', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            if (!res.ok) {
+                alert('Error de autenticación. Recarga la página.');
+                return;
+            }
+
+            const data = await res.json();
+            const tbody = document.getElementById('pending-body');
+            tbody.innerHTML = '';
+
+            data.commissions.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="checkbox" class="commission-check" value="${c.id}"></td>
+                    <td>#${c.id}</td>
+                    <td>${c.affiliate?.full_name || 'N/A'}</td>
+                    <td>${c.affiliate?.email || 'N/A'}</td>
+                    <td style="font-family: monospace; font-size: 11px;">${c.affiliate?.usdt_wallet || 'No configurado'}</td>
+                    <td>User #${c.user_id}</td>
+                    <td>$${c.topup_amount.toFixed(2)}</td>
+                    <td style="font-weight: 600; color: #F59E0B;">$${c.amount.toFixed(2)}</td>
+                    <td>${new Date(c.created_at).toLocaleDateString()}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadAffiliates() {
+            const res = await fetch(API_BASE + '/admin/affiliates', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            const data = await res.json();
+            const tbody = document.getElementById('affiliates-body');
+            tbody.innerHTML = '';
+
+            data.affiliates.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>#${a.id}</td>
+                    <td style="font-family: monospace; color: #38BDF8;">${a.affiliate_code}</td>
+                    <td>${a.email}</td>
+                    <td>${a.full_name || '-'}</td>
+                    <td>${a.telegram_handle || '-'}</td>
+                    <td style="font-family: monospace; font-size: 11px;">${a.usdt_wallet || 'No configurado'}</td>
+                    <td>${new Date(a.created_at).toLocaleDateString()}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function calculateStats() {
+            const rows = document.querySelectorAll('#pending-body tr');
+            let totalPending = 0;
+            let count = rows.length;
+
+            rows.forEach(row => {
+                const amountText = row.cells[7].textContent;
+                const amount = parseFloat(amountText.replace('$', ''));
+                totalPending += amount;
+            });
+
+            const statsDiv = document.getElementById('stats-summary');
+            statsDiv.innerHTML = `
+                <div class="stat-box">
+                    <div class="label">Comisiones Pendientes</div>
+                    <div class="value">${count}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Total a Pagar</div>
+                    <div class="value">$${totalPending.toFixed(2)}</div>
+                </div>
+            `;
+        }
+
+        function toggleAll(checkbox) {
+            document.querySelectorAll('.commission-check').forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+        }
+
+        async function markSelectedAsPaid() {
+            const selected = Array.from(document.querySelectorAll('.commission-check:checked'))
+                .map(cb => parseInt(cb.value));
+
+            if (selected.length === 0) {
+                alert('Selecciona al menos una comisión');
+                return;
+            }
+
+            if (!confirm(`¿Marcar ${selected.length} comisiones como pagadas?`)) {
+                return;
+            }
+
+            const res = await fetch(API_BASE + '/admin/commissions/mark-paid', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ commission_ids: selected })
+            });
+
+            if (res.ok) {
+                alert('Comisiones marcadas como pagadas');
+                loadData();
+            } else {
+                alert('Error al marcar comisiones');
+            }
+        }
+
+        async function exportPending() {
+            window.open(API_BASE + '/admin/export/pending?token=' + token, '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -22,6 +22,17 @@ type WebAssets struct {
 func SetWebRouter(router *gin.Engine, assets WebAssets) {
 	frontendFS := common.EmbedFolder(assets.BuildFS, "web/dist")
 
+	// Serve affiliate HTML pages
+	router.GET("/affiliates", func(c *gin.Context) {
+		c.File("web/affiliates.html")
+	})
+	router.GET("/affiliate-dashboard.html", func(c *gin.Context) {
+		c.File("web/affiliate-dashboard.html")
+	})
+	router.GET("/affiliate-admin.html", func(c *gin.Context) {
+		c.File("web/affiliate-admin.html")
+	})
+
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.Use(middleware.GlobalWebRateLimit())
 	router.Use(middleware.Cache())
