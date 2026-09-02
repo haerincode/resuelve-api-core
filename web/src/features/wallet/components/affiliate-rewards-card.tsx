@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { Share2 } from 'lucide-react'
+import { Share2, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { CopyButton } from '@/components/copy-button'
@@ -28,6 +28,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatQuota } from '@/lib/format'
 
 import type { UserWalletData } from '../types'
+
+const AFFILIATE_DASHBOARD_URL = import.meta.env.VITE_AFFILIATE_DASHBOARD_URL || 'https://resuelve-api-affiliate.onrender.com/dashboard.html'
 
 interface AffiliateRewardsCardProps {
   user: UserWalletData | null
@@ -98,30 +100,46 @@ export function AffiliateRewardsCard({
           ))}
         </div>
 
-        <div className='flex items-center gap-2'>
-          <Input
-            value={affiliateLink}
-            readOnly
-            className='border-muted bg-background/70 h-9 min-w-0 flex-1 font-mono text-xs'
-          />
-          <CopyButton
-            value={affiliateLink}
-            variant='outline'
-            className='bg-background size-9 shrink-0'
-            iconClassName='size-4'
-            tooltip={t('Copy referral link')}
-            aria-label={t('Copy referral link')}
-          />
-          {hasRewards && (
+        <div className='flex flex-col gap-2'>
+          <div className='flex items-center gap-2'>
+            <Input
+              value={affiliateLink}
+              readOnly
+              className='border-muted bg-background/70 h-9 min-w-0 flex-1 font-mono text-xs'
+            />
+            <CopyButton
+              value={affiliateLink}
+              variant='outline'
+              className='bg-background size-9 shrink-0'
+              iconClassName='size-4'
+              tooltip={t('Copy referral link')}
+              aria-label={t('Copy referral link')}
+            />
+            {hasRewards && (
+              <Button
+                onClick={onTransfer}
+                disabled={!complianceConfirmed}
+                className='h-9 shrink-0 px-3'
+                size='sm'
+              >
+                {t('Transfer to Balance')}
+              </Button>
+            )}
+          </div>
+          <div className='flex items-center gap-2'>
             <Button
-              onClick={onTransfer}
-              disabled={!complianceConfirmed}
-              className='h-9 shrink-0 px-3'
+              variant='outline'
               size='sm'
+              className='h-8 gap-1.5 text-xs'
+              onClick={() => window.open(AFFILIATE_DASHBOARD_URL, '_blank')}
             >
-              {t('Transfer to Balance')}
+              <ExternalLink className='size-3.5' />
+              {t('Affiliate Dashboard')}
             </Button>
-          )}
+            <span className='text-muted-foreground text-[10px]'>
+              {t('View detailed commission history and manage payouts')}
+            </span>
+          </div>
         </div>
         {!complianceConfirmed ? (
           <p className='text-muted-foreground text-xs lg:col-span-3'>
