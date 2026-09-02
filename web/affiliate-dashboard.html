@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Dashboard de afiliados Resuelve API - Gana comisiones del 30% en USDT por cada cliente que traigas. Monitorea tus referidos, comisiones y pagos en tiempo real.">
-    <meta name="keywords" content="afiliados API IA, comisiones USDT, programa referidos, API Claude, API GPT, ganar dinero IA">
+    <meta name="description" content="Resuelve API Affiliate Dashboard - Earn 30% commission in USDT for every client you bring. Monitor your referrals, commissions and payments in real time.">
+    <meta name="keywords" content="AI API affiliates, USDT commissions, referral program, Claude API, GPT API, earn money AI">
     <meta name="robots" content="noindex, nofollow">
-    <title>Dashboard Afiliado - Resuelve API</title>
+    <title>Affiliate Dashboard - Resuelve API</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -49,169 +49,203 @@
             background: #1E293B;
             padding: 25px;
             border-radius: 8px;
-            margin-bottom: 20px;
             border: 1px solid #334155;
-        }
-        h2 {
-            font-size: 20px;
             margin-bottom: 20px;
-            color: #F8FAFC;
         }
-        .referral-link {
+        .section h2 { color: #38BDF8; margin-bottom: 15px; }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
             background: #0F172A;
-            padding: 15px;
-            border-radius: 6px;
             border: 1px solid #334155;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .link-text {
-            font-family: monospace;
-            color: #38BDF8;
-            word-break: break-all;
+            border-radius: 6px;
+            color: #F8FAFC;
+            font-size: 14px;
         }
         button {
             background: #38BDF8;
             color: #0B0E14;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 6px;
-            cursor: pointer;
             font-weight: 600;
+            cursor: pointer;
             font-size: 14px;
         }
         button:hover { background: #22D3EE; }
-        button.secondary {
-            background: #334155;
-            color: #F8FAFC;
-        }
-        button.secondary:hover { background: #475569; }
-        input {
-            width: 100%;
-            padding: 12px;
-            background: #0F172A;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            color: #F8FAFC;
-            font-size: 14px;
-            margin-bottom: 15px;
+        .logout {
+            background: #F97316;
+            float: right;
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 15px;
         }
         th, td {
-            text-align: left;
             padding: 12px;
+            text-align: left;
             border-bottom: 1px solid #334155;
         }
-        th {
-            color: #94A3B8;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
+        th { color: #94A3B8; font-weight: 600; }
+        .copy-btn {
+            background: #22D3EE;
+            padding: 8px 16px;
             font-size: 12px;
-            font-weight: 600;
+            margin-left: 10px;
         }
-        .badge.pending {
-            background: #F59E0B;
-            color: #0B0E14;
+        .toggle-link {
+            color: #38BDF8;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 14px;
+            display: block;
+            margin-top: 15px;
+            text-align: center;
         }
-        .badge.paid {
-            background: #10B981;
-            color: #0B0E14;
-        }
-        .logout {
-            float: right;
-            background: #EF4444;
-        }
-        .logout:hover { background: #DC2626; }
-        #login-form, #dashboard { display: none; }
     </style>
+    <script>
+        // Referral tracker
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode) {
+            document.cookie = `aff_code=${refCode}; path=/; max-age=2592000`;
+        }
+
+        // i18n
+        let lang = navigator.language.startsWith('es') ? 'es' : 'en';
+        const t = {
+            es: {
+                loginTitle: 'Login Afiliado',
+                registerTitle: 'Registro de Afiliado',
+                registerTitle: 'Registro de Afiliado',
+                email: 'Email',
+                password: 'Contraseña',
+                usdtWallet: 'Wallet USDT (TRC20)',
+                loginBtn: 'Iniciar Sesión',
+                registerBtn: 'Registrarse',
+                toggleRegister: '¿No tienes cuenta? Regístrate aquí',
+                toggleLogin: '¿Ya tienes cuenta? Inicia sesión aquí',
+                logout: 'Cerrar Sesión',
+                dashboardTitle: 'Panel de Control de Afiliados - Resuelve API',
+                howItWorks: 'Cómo Funciona el Programa de Afiliados',
+                howItWorksText: 'Resuelve API te permite ganar <strong>30% de comisión en USDT</strong> por cada cliente que traigas. Cuando alguien se registra usando tu enlace de referido único y recarga saldo para usar nuestras APIs de IA (Claude, GPT-4, Gemini, etc.), recibes el 30% del monto recargado directamente en tu wallet USDT.',
+                advantages: '<strong>Ventajas del programa:</strong> Sin límite de ganancias, pagos automáticos en USDT (TRC20), comisiones recurrentes por cada recarga del cliente, dashboard en tiempo real con estadísticas detalladas, y soporte dedicado para afiliados. Ideal para creadores de contenido, desarrolladores, comunidades tech, y cualquiera que trabaje con APIs de inteligencia artificial.',
+                howToStart: '<strong>Cómo empezar:</strong> Comparte tu link único de referido en redes sociales, foros de desarrolladores, grupos de Telegram, o tu blog. Cada vez que alguien recargue saldo usando tu código, verás la comisión reflejada aquí inmediatamente. Las comisiones se acumulan y puedes solicitar el pago a tu wallet USDT cuando lo necesites. Únete a cientos de afiliados que ya están ganando con Resuelve API.',
+                pendingCommission: 'Comisión Pendiente',
+                totalEarned: 'Total Ganado',
+                referredClients: 'Clientes Referidos',
+                yourReferralLink: 'Tu Enlace de Referido',
+                copy: 'Copiar',
+                updateWallet: 'Actualizar Wallet USDT',
+                commissionHistory: 'Historial de Comisiones',
+                date: 'Fecha',
+                user: 'Usuario',
+                topupAmount: 'Monto Recarga',
+                commission: 'Comisión',
+            },
+            en: {
+                loginTitle: 'Affiliate Login',
+                registerTitle: 'Affiliate Registration',
+                email: 'Email',
+                password: 'Password',
+                usdtWallet: 'USDT Wallet (TRC20)',
+                loginBtn: 'Login',
+                registerBtn: 'Register',
+                toggleRegister: "Don't have an account? Register here",
+                toggleRegister: "Don't have an account? Register here",
+                toggleLogin: 'Already have an account? Login here',
+                logout: 'Logout',
+                dashboardTitle: 'Affiliate Control Panel - Resuelve API',
+                howItWorks: 'How the Affiliate Program Works',
+                howItWorksText: 'Resuelve API allows you to earn <strong>30% commission in USDT</strong> for every client you bring. When someone registers using your unique referral link and reloads balance to use our AI APIs (Claude, GPT-4, Gemini, etc.), you receive 30% of the reloaded amount directly to your USDT wallet.',
+                advantages: '<strong>Program advantages:</strong> No earnings limit, automatic USDT payments (TRC20), recurring commissions for each customer reload, real-time dashboard with detailed statistics, and dedicated support for affiliates. Ideal for content creators, developers, tech communities, and anyone working with artificial intelligence APIs.',
+                howToStart: '<strong>How to start:</strong> Share your unique referral link on social media, developer forums, Telegram groups, or your blog. Every time someone reloads balance using your code, you will see the commission reflected here immediately. Commissions accumulate and you can request payment to your USDT wallet when you need it. Join hundreds of affiliates already earning with Resuelve API.',
+                pendingCommission: 'Pending Commission',
+                totalEarned: 'Total Earned',
+                referredClients: 'Referred Clients',
+                yourReferralLink: 'Your Referral Link',
+                copy: 'Copy',
+                updateWallet: 'Update USDT Wallet',
+                commissionHistory: 'Commission History',
+                date: 'Date',
+                user: 'User',
+                topupAmount: 'Topup Amount',
+                commission: 'Commission',
+            }
+        };
+
+        function tr(key) {
+            return t[lang][key] || key;
+        }
+    </script>
 </head>
 <body>
     <div class="container">
-        <div id="login-form">
+        <div id="auth-form">
             <div class="section" style="max-width: 400px; margin: 100px auto;">
-                <h2>Login Afiliado</h2>
-                <input type="email" id="email" placeholder="Email">
-                <input type="password" id="password" placeholder="Password">
-                <button onclick="login()">Iniciar Sesión</button>
+                <h2 id="auth-title"></h2>
+                <input type="email" id="email" placeholder="">
+                <input type="password" id="password" placeholder="">
+                <input type="text" id="usdt-wallet-reg" placeholder="" style="display:none;">
+                <button id="auth-btn" onclick="handleAuth()"></button>
+                <a class="toggle-link" id="toggle-link" onclick="toggleAuthMode()"></a>
             </div>
         </div>
 
-        <div id="dashboard">
+        <div id="dashboard" style="display:none;">
             <div class="header">
-                <h1>Panel de Control de Afiliados - Resuelve API</h1>
-                <button class="logout" onclick="logout()">Cerrar Sesión</button>
+                <h1 id="dash-title"></h1>
+                <button class="logout" onclick="logout()" id="logout-btn"></button>
                 <p id="email-display" style="color: #94A3B8; margin-top: 5px;"></p>
             </div>
 
             <div class="section" style="background: #0F172A; border-color: #22D3EE; margin-bottom: 25px;">
-                <h2>Cómo Funciona el Programa de Afiliados</h2>
-                <p style="color: #CBD5E1; line-height: 1.8; margin-bottom: 12px;">
-                    Resuelve API te permite ganar <strong style="color: #38BDF8;">30% de comisión en USDT</strong> por cada cliente que traigas.
-                    Cuando alguien se registra usando tu enlace de referido único y recarga saldo para usar nuestras APIs de IA (Claude, GPT-4, Gemini, etc.),
-                    recibes el 30% del monto recargado directamente en tu wallet USDT.
-                </p>
-                <p style="color: #CBD5E1; line-height: 1.8; margin-bottom: 12px;">
-                    <strong>Ventajas del programa:</strong> Sin límite de ganancias, pagos automáticos en USDT (TRC20), comisiones recurrentes por cada recarga del cliente,
-                    dashboard en tiempo real con estadísticas detalladas, y soporte dedicado para afiliados. Ideal para creadores de contenido, desarrolladores,
-                    comunidades tech, y cualquiera que trabaje con APIs de inteligencia artificial.
-                </p>
-                <p style="color: #CBD5E1; line-height: 1.8;">
-                    <strong>Cómo empezar:</strong> Comparte tu link único de referido en redes sociales, foros de desarrolladores, grupos de Telegram, o tu blog.
-                    Cada vez que alguien recargue saldo usando tu código, verás la comisión reflejada aquí inmediatamente. Las comisiones se acumulan y puedes solicitar
-                    el pago a tu wallet USDT cuando lo necesites. Únete a cientos de afiliados que ya están ganando con Resuelve API.
-                </p>
+                <h2 id="how-works-title"></h2>
+                <p style="color: #CBD5E1; line-height: 1.8; margin-bottom: 12px;" id="how-works-text"></p>
+                <p style="color: #CBD5E1; line-height: 1.8; margin-bottom: 12px;" id="advantages-text"></p>
+                <p style="color: #CBD5E1; line-height: 1.8;" id="how-start-text"></p>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">Comisión Pendiente</div>
+                    <div class="stat-label" id="pending-label"></div>
                     <div class="stat-value" id="pending">$0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Total Ganado</div>
+                    <div class="stat-label" id="total-label"></div>
                     <div class="stat-value" id="total">$0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Clientes Referidos</div>
+                    <div class="stat-label" id="invites-label"></div>
                     <div class="stat-value" id="invites">0</div>
                 </div>
             </div>
 
             <div class="section">
-                <h2>Tu Link de Referido</h2>
-                <div class="referral-link">
-                    <span class="link-text" id="referral-url"></span>
-                    <button onclick="copyLink()">Copiar</button>
+                <h2 id="ref-link-title"></h2>
+                <div style="display: flex; align-items: center;">
+                    <input type="text" id="referral-url" readonly style="flex: 1;">
+                    <button class="copy-btn" onclick="copyReferralUrl()" id="copy-btn"></button>
                 </div>
             </div>
 
             <div class="section">
-                <h2>Wallet USDT</h2>
-                <input type="text" id="usdt-wallet" placeholder="Tu dirección USDT (TRC20)">
-                <button onclick="updateWallet()">Actualizar Wallet</button>
+                <h2 id="update-wallet-title"></h2>
+                <input type="text" id="usdt-wallet" placeholder="TRC20 Wallet Address">
+                <button onclick="updateWallet()" id="update-wallet-btn"></button>
             </div>
 
             <div class="section">
-                <h2>Historial de Comisiones</h2>
-                <table id="commissions-table">
+                <h2 id="commission-history-title"></h2>
+                <table>
                     <thead>
                         <tr>
-                            <th>Fecha</th>
-                            <th>Usuario</th>
-                            <th>Recarga</th>
-                            <th>Comisión</th>
-                            <th>Estado</th>
+                            <th id="th-date"></th>
+                            <th id="th-user"></th>
+                            <th id="th-topup"></th>
+                            <th id="th-commission"></th>
                         </tr>
                     </thead>
                     <tbody id="commissions-body"></tbody>
@@ -221,23 +255,59 @@
     </div>
 
     <script>
-        const API_BASE = window.location.origin + '/api/affiliate';
+        const API_BASE = window.location.origin.replace('affiliate.', 'api.') + '/api/affiliate';
         let token = localStorage.getItem('affiliate_token');
+        let isRegisterMode = false;
 
-        if (token) {
-            loadDashboard();
-        } else {
-            document.getElementById('login-form').style.display = 'block';
+        function applyTranslations() {
+            document.getElementById('auth-title').textContent = tr(isRegisterMode ? 'registerTitle' : 'loginTitle');
+            document.getElementById('email').placeholder = tr('email');
+            document.getElementById('password').placeholder = tr('password');
+            document.getElementById('usdt-wallet-reg').placeholder = tr('usdtWallet');
+            document.getElementById('auth-btn').textContent = tr(isRegisterMode ? 'registerBtn' : 'loginBtn');
+            document.getElementById('toggle-link').textContent = tr(isRegisterMode ? 'toggleLogin' : 'toggleRegister');
+            document.getElementById('logout-btn').textContent = tr('logout');
+            document.getElementById('dash-title').textContent = tr('dashboardTitle');
+            document.getElementById('how-works-title').textContent = tr('howItWorks');
+            document.getElementById('how-works-text').innerHTML = tr('howItWorksText');
+            document.getElementById('advantages-text').innerHTML = tr('advantages');
+            document.getElementById('how-start-text').innerHTML = tr('howToStart');
+            document.getElementById('pending-label').textContent = tr('pendingCommission');
+            document.getElementById('total-label').textContent = tr('totalEarned');
+            document.getElementById('invites-label').textContent = tr('referredClients');
+            document.getElementById('ref-link-title').textContent = tr('yourReferralLink');
+            document.getElementById('copy-btn').textContent = tr('copy');
+            document.getElementById('update-wallet-title').textContent = tr('updateWallet');
+            document.getElementById('update-wallet-btn').textContent = tr('updateWallet');
+            document.getElementById('commission-history-title').textContent = tr('commissionHistory');
+            document.getElementById('th-date').textContent = tr('date');
+            document.getElementById('th-user').textContent = tr('user');
+            document.getElementById('th-topup').textContent = tr('topupAmount');
+            document.getElementById('th-commission').textContent = tr('commission');
         }
 
-        async function login() {
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('usdt-wallet-reg').style.display = isRegisterMode ? 'block' : 'none';
+            applyTranslations();
+        }
+
+        async function handleAuth() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const endpoint = isRegisterMode ? '/register' : '/login';
+            const body = { email, password };
 
-            const res = await fetch(API_BASE + '/login', {
+            if (isRegisterMode) {
+                body.usdt_wallet = document.getElementById('usdt-wallet-reg').value;
+                const affCode = getCookie('aff_code');
+                if (affCode) body.aff_code = affCode;
+            }
+
+            const res = await fetch(API_BASE + endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify(body)
             });
 
             const data = await res.json();
@@ -247,8 +317,13 @@
                 localStorage.setItem('affiliate_email', data.email);
                 location.reload();
             } else {
-                alert(data.error || 'Login failed');
+                alert(data.error || (isRegisterMode ? 'Registration failed' : 'Login failed'));
             }
+        }
+
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? match[2] : null;
         }
 
         function logout() {
@@ -258,7 +333,7 @@
         }
 
         async function loadDashboard() {
-            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('auth-form').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
 
             const email = localStorage.getItem('affiliate_email');
@@ -279,9 +354,9 @@
             document.getElementById('invites').textContent = data.referred_count;
             document.getElementById('usdt-wallet').value = data.usdt_wallet || '';
 
-            const baseUrl = window.location.origin.replace('api.', '').replace(':3000', '');
+            const baseUrl = window.location.origin.replace('api.', '').replace('affiliate.', '').replace(':3000', '');
             const referralUrl = `${baseUrl}?ref=${data.affiliate_code}`;
-            document.getElementById('referral-url').textContent = referralUrl;
+            document.getElementById('referral-url').value = referralUrl;
 
             loadCommissions();
         }
@@ -302,27 +377,15 @@
                     <td>User #${c.user_id}</td>
                     <td>$${c.topup_amount.toFixed(2)}</td>
                     <td>$${c.amount.toFixed(2)}</td>
-                    <td><span class="badge ${c.paid ? 'paid' : 'pending'}">${c.paid ? 'Pagado' : 'Pendiente'}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function copyLink() {
-            const text = document.getElementById('referral-url').textContent;
-            navigator.clipboard.writeText(text);
-            alert('Link copiado!');
-        }
-
         async function updateWallet() {
             const wallet = document.getElementById('usdt-wallet').value;
-            if (!wallet) {
-                alert('Ingresa una dirección USDT');
-                return;
-            }
-
-            const res = await fetch(API_BASE + '/wallet', {
-                method: 'PUT',
+            const res = await fetch(API_BASE + '/update-wallet', {
+                method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + token,
                     'Content-Type': 'application/json'
@@ -331,11 +394,26 @@
             });
 
             if (res.ok) {
-                alert('Wallet actualizado exitosamente');
+                alert(lang === 'es' ? 'Wallet actualizado exitosamente' : 'Wallet updated successfully');
             } else {
-                alert('Error al actualizar wallet');
+                alert(lang === 'es' ? 'Error al actualizar wallet' : 'Error updating wallet');
             }
         }
+
+        function copyReferralUrl() {
+            const input = document.getElementById('referral-url');
+            input.select();
+            document.execCommand('copy');
+            alert(lang === 'es' ? '¡Enlace copiado!' : 'Link copied!');
+        }
+
+        if (token) {
+            loadDashboard();
+        } else {
+            document.getElementById('auth-form').style.display = 'block';
+        }
+
+        applyTranslations();
     </script>
 </body>
 </html>

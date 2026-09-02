@@ -22,6 +22,7 @@ type AffiliateRegisterRequest struct {
 	UsdtWallet      string `json:"usdt_wallet" binding:"required"`
 	FullName        string `json:"full_name"`
 	TelegramHandle  string `json:"telegram_handle"`
+	AffCode         string `json:"aff_code"`
 }
 
 type AffiliateLoginRequest struct {

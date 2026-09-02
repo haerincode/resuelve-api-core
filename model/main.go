@@ -345,9 +345,13 @@ func migrateDB() error {
 		&PerfMetric{},
 		&SystemInstance{},
 		&SystemTask{},
+		&Affiliate{},
+		&AffiliateCommission{},
 		&SystemTaskLock{},
 		&CasbinRule{},
 		&AuthzRole{},
+		&Affiliate{},
+		&AffiliateCommission{},
 	)
 	if err != nil {
 		return err

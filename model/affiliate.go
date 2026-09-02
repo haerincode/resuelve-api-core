@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/QuantumNous/new-api/common"
 	"time"
 )
 
@@ -36,13 +37,38 @@ func (AffiliateCommission) TableName() string {
 	return "affiliate_commissions"
 }
 
-func init() {
-	if DB == nil {
+func GetAffiliateByEmail(email string) (*Affiliate, error) {
+	var affiliate Affiliate
+	err := DB.Where("email = ?", email).First(&affiliate).Error
+	return &affiliate, err
+}
+
+func RecordAffiliateCommission(userID int, topupAmount float64) {
+	user, err := GetUserById(userID, false)
+	if err != nil || user.InviterId == 0 {
 		return
 	}
 
-	// Auto-migrate affiliate tables
-	if err := DB.AutoMigrate(&Affiliate{}, &AffiliateCommission{}); err != nil {
-		panic("failed to migrate affiliate tables: " + err.Error())
+	inviter, err := GetUserById(user.InviterId, false)
+	if err != nil {
+		return
+	}
+
+	affiliate, err := GetAffiliateByEmail(inviter.Email)
+	if err != nil {
+		return
+	}
+
+	commissionAmount := topupAmount * 0.30
+	commission := AffiliateCommission{
+		AffiliateID: affiliate.ID,
+		UserID:      userID,
+		Amount:      commissionAmount,
+		TopupAmount: topupAmount,
+		Paid:        false,
+	}
+
+	if err := DB.Create(&commission).Error; err != nil {
+		common.SysError("Failed to create affiliate commission: " + err.Error())
 	}
 }

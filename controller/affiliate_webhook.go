@@ -32,12 +32,17 @@ func HandleTopupWebhook(c *gin.Context) {
 		return
 	}
 
-	affiliateID := user.InviterId
+	// Get inviter user
+	inviter, err := model.GetUserById(user.InviterId, false)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Inviter user not found"})
+		return
+	}
 
-	// Check if affiliate exists
-	var affiliate model.Affiliate
-	if err := model.DB.Where("id = ?", affiliateID).First(&affiliate).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Affiliate not found"})
+	// Get affiliate by inviter email
+	affiliate, err := model.GetAffiliateByEmail(inviter.Email)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Affiliate not found for inviter"})
 		return
 	}
 
@@ -46,7 +51,7 @@ func HandleTopupWebhook(c *gin.Context) {
 
 	// Create commission record
 	commission := model.AffiliateCommission{
-		AffiliateID: affiliateID,
+		AffiliateID: affiliate.ID,
 		UserID:      req.UserID,
 		Amount:      commissionAmount,
 		TopupAmount: req.Amount,
@@ -59,8 +64,8 @@ func HandleTopupWebhook(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":     "Commission recorded",
-		"affiliate_id": affiliateID,
-		"amount":      commissionAmount,
+		"message":      "Commission recorded",
+		"affiliate_id": affiliate.ID,
+		"amount":       commissionAmount,
 	})
 }
