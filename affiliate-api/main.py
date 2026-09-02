@@ -12,7 +12,8 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, EmailStr
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -33,6 +34,23 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Static files
+@app.get("/dashboard.html")
+async def serve_dashboard():
+    return FileResponse("dashboard.html")
+
+@app.get("/admin.html")
+async def serve_admin():
+    return FileResponse("admin.html")
+
+@app.get("/affiliates")
+async def serve_affiliates():
+    return FileResponse("affiliates.html")
+
+@app.get("/")
+async def root():
+    return FileResponse("affiliates.html")
 
 def get_db():
     conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
