@@ -45,6 +45,18 @@ import { routeTree } from './routeTree.gen'
 // Styles
 import './styles/index.css'
 
+// Inline critical CSS above-the-fold (hero, nav, contrast fix)
+const criticalCSS = `
+:root{--primary-light:#0F7BB1;--primary-dark:#5BB2E8}
+.hero-section{min-height:60vh;display:flex;align-items:center;background:linear-gradient(135deg,#0B0E14,#1E293B)}
+.nav-bar{position:sticky;top:0;background:#0F172Aee;backdrop-filter:blur(8px);z-index:50}
+.primary-btn{background:var(--primary-light);color:#fff;padding:0.75rem 1.5rem;border-radius:0.5rem;font-weight:600}
+@media(prefers-color-scheme:dark){.primary-btn{background:var(--primary-dark)}}
+`
+const style = document.createElement('style')
+style.textContent = criticalCSS
+document.head.appendChild(style)
+
 // Ensure VChart theme is initialized before any chart mounts (prevents white default theme flash)
 // VChart theme is driven by our ThemeProvider (html.light/html.dark) via per-chart `theme` prop.
 initializeFrontendCache()
