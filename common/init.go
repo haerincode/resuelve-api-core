@@ -56,6 +56,8 @@ func InitEnv() {
 		} else {
 			SessionSecret = ss
 		}
+	} else {
+		log.Println("WARNING: SESSION_SECRET is unset, so a new secret is generated on every start. Every restart invalidates all dashboard logins, and multi-node deployments cannot validate each other's sessions. Set SESSION_SECRET to a persistent random string.")
 	}
 	if os.Getenv("CRYPTO_SECRET") != "" {
 		CryptoSecret = os.Getenv("CRYPTO_SECRET")
@@ -63,6 +65,9 @@ func InitEnv() {
 		CryptoSecret = SessionSecret
 	}
 	if err := InitSessionCookieSettings(); err != nil {
+		log.Fatal(err)
+	}
+	if err := InitCORSSettings(); err != nil {
 		log.Fatal(err)
 	}
 	initUserSessionSettings()
