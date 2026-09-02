@@ -109,7 +109,7 @@ For commercial licensing, please contact support@quantumnous.com
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.692 0.141 243.716);
+  --primary: oklch(0.72 0.15 243.716);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.95 0 0);
   --secondary-foreground: oklch(0.42 0.16 250);
@@ -186,7 +186,7 @@ For commercial licensing, please contact support@quantumnous.com
   --card-foreground: oklch(0.965 0 0);
   --popover: oklch(0.305 0 0);
   --popover-foreground: oklch(0.965 0 0);
-  --primary: oklch(0.54 0.142 248.516);
+  --primary: oklch(0.62 0.16 248.516);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.335 0 0);
   --secondary-foreground: oklch(0.9 0.05 250);

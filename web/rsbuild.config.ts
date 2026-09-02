@@ -80,11 +80,24 @@ export default defineConfig(({ envMode }) => {
       // Rely on Rsbuild default legalComments ("linked" → per-chunk *.LICENSE.txt) in all modes.
       // Do not set "none" in production: that strips minifier-preserved third-party notices and
       // extracted license files, which some distributions require for open-source compliance.
+      assetPrefix: isProd ? '/' : undefined,
+      sourceMap: {
+        js: isProd ? 'source-map' : 'cheap-module-source-map',
+        css: false,
+      },
     },
     performance: {
       // Remove console in production
       removeConsole: isProd ? ['log'] : false,
       buildCache: false,
+      chunkSplit: {
+        strategy: 'split-by-experience',
+        override: {
+          chunks: 'async',
+          minSize: 20000,
+          maxInitialRequests: 30,
+        },
+      },
     },
     tools: {
       rspack: {

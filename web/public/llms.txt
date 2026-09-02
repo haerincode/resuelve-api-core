@@ -1,0 +1,11 @@
+# Resuelve-API
+
+Unified AI API gateway for Latin America providing access to Claude, GPT, Gemini, and 40+ AI providers.
+
+## Links
+
+- Home: https://resuelve-api.lat
+- Documentation: https://resuelve-api.lat/docs
+- Pricing: https://resuelve-api.lat/pricing
+- Console: https://resuelve-api.lat/console
+- API Status: https://resuelve-api.lat/about
