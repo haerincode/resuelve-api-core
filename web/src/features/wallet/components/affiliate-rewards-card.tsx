@@ -29,7 +29,7 @@ import { formatQuota } from '@/lib/format'
 
 import type { UserWalletData } from '../types'
 
-const AFFILIATE_DASHBOARD_URL = import.meta.env.VITE_AFFILIATE_DASHBOARD_URL || 'https://resuelve-api-affiliate.onrender.com/dashboard.html'
+const AFFILIATE_DASHBOARD_URL = import.meta.env.VITE_AFFILIATE_DASHBOARD_URL || 'https://affiliate.resuelve-api.lat/dashboard.html'
 
 interface AffiliateRewardsCardProps {
   user: UserWalletData | null
