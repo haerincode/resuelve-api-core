@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { Share2, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
@@ -28,7 +29,6 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatQuota } from '@/lib/format'
 import { API } from '@/lib/api'
-import { showError } from '@/lib/toast'
 
 import type { UserWalletData } from '../types'
 
@@ -67,7 +67,7 @@ export function AffiliateRewardsCard({
         window.open('https://affiliate.resuelve-api.lat/affiliate-dashboard.html', '_blank')
       }
     } catch (error: any) {
-      showError(error.message || t('Failed to access affiliate dashboard'))
+      toast.error(error.message || t('Failed to access affiliate dashboard'))
     } finally {
       setIsLoadingDashboard(false)
     }
