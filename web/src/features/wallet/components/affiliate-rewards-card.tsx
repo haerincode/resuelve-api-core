@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { Share2, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
 
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
@@ -26,6 +27,8 @@ import { IconBadge } from '@/components/ui/icon-badge'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatQuota } from '@/lib/format'
+import { API } from '@/lib/api'
+import { showError } from '@/lib/toast'
 
 import type { UserWalletData } from '../types'
 
@@ -47,6 +50,29 @@ export function AffiliateRewardsCard({
   loading,
 }: AffiliateRewardsCardProps) {
   const { t } = useTranslation()
+  const [isLoadingDashboard, setIsLoadingDashboard] = useState(false)
+
+  const handleOpenDashboard = async () => {
+    setIsLoadingDashboard(true)
+    try {
+      const res = await API.get('/api/user/self/affiliate-token')
+      const data = res.data
+
+      if (data.needs_registration) {
+        // No affiliate account - open registration page
+        window.open(`https://affiliate.resuelve-api.lat/affiliates?email=${encodeURIComponent(data.email)}&code=${encodeURIComponent(data.affiliate_code)}`, '_blank')
+      } else {
+        // Has account - open dashboard with token
+        localStorage.setItem('affiliate_token', data.token)
+        window.open('https://affiliate.resuelve-api.lat/affiliate-dashboard.html', '_blank')
+      }
+    } catch (error: any) {
+      showError(error.message || t('Failed to access affiliate dashboard'))
+    } finally {
+      setIsLoadingDashboard(false)
+    }
+  }
+
   if (loading) {
     return (
       <Card data-card-hover='false' className='bg-muted/20 py-0'>
@@ -131,10 +157,11 @@ export function AffiliateRewardsCard({
               variant='outline'
               size='sm'
               className='h-8 gap-1.5 text-xs'
-              onClick={() => window.open(AFFILIATE_DASHBOARD_URL, '_blank')}
+              onClick={handleOpenDashboard}
+              disabled={isLoadingDashboard}
             >
               <ExternalLink className='size-3.5' />
-              {t('Affiliate Dashboard')}
+              {isLoadingDashboard ? t('Loading...') : t('Affiliate Dashboard')}
             </Button>
             <span className='text-muted-foreground text-[10px]'>
               {t('View detailed commission history and manage payouts')}

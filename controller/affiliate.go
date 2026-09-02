@@ -45,6 +45,52 @@ func generateAffiliateCode() (string, error) {
 	return strings.ToUpper(base64.RawURLEncoding.EncodeToString(b)[:8]), nil
 }
 
+func GetUserAffiliateToken(c *gin.Context) {
+	userID := c.GetInt("id")
+	user, err := model.GetUserById(userID, false)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Check if user has AffCode
+	if user.AffCode == "" {
+		user.AffCode = common.GetRandomString(4)
+		if err := user.Update(false); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate affiliate code"})
+			return
+		}
+	}
+
+	// Check if affiliate account exists with this user's email
+	affiliate := &model.Affiliate{}
+	err = model.DB.Where("email = ?", user.Email).First(affiliate).Error
+	if err != nil {
+		// No affiliate account - redirect to registration
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"needs_registration": true,
+			"email": user.Email,
+			"affiliate_code": user.AffCode,
+		})
+		return
+	}
+
+	token, err := generateJWT(affiliate.ID, affiliate.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"needs_registration": false,
+		"token": token,
+		"email": affiliate.Email,
+		"affiliate_code": affiliate.AffiliateCode,
+	})
+}
+
 func generateJWT(affiliateID int, email string) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
