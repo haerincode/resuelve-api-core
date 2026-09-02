@@ -28,7 +28,7 @@ import { IconBadge } from '@/components/ui/icon-badge'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatQuota } from '@/lib/format'
-import { API } from '@/lib/api'
+import { api } from '@/lib/api'
 
 import type { UserWalletData } from '../types'
 
@@ -55,7 +55,7 @@ export function AffiliateRewardsCard({
   const handleOpenDashboard = async () => {
     setIsLoadingDashboard(true)
     try {
-      const res = await API.get('/api/user/self/affiliate-token')
+      const res = await api.get('/api/user/self/affiliate-token')
       const data = res.data
 
       if (data.needs_registration) {
