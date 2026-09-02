@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Panel · Afiliados</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0B0E14;--card:#14171f;--line:#232733;--txt:#e8ecf3;--dim:#8b93a5;--dim2:#5f6779;
+--acc:#38BDF8;--ok:#4FD1C5;--warn:#F59E0B;--err:#F87171;
+--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--r:12px;
+}
+body{background:var(--bg);color:var(--txt);font:15px/1.5 -apple-system,BlinkMacSystemFont,Inter,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1340px;margin:0 auto;padding:20px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(145deg,#22D3EE,#38BDF8);display:grid;place-items:center;font-weight:800;font-size:16px;color:#0a0a0a}
+h1{font-size:19px;letter-spacing:-.02em}
+.tabs{display:flex;gap:8px;margin-left:auto}
+.tab{padding:8px 14px;background:#1a1d26;border:1px solid var(--line);border-radius:8px;color:var(--dim);font:600 13px var(--mono);cursor:pointer;transition:.15s}
+.tab.active{background:var(--acc);color:#0a0a0a;border-color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:16px}
+.h2{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.btn{padding:9px 15px;background:linear-gradient(145deg,#22D3EE,#38BDF8);border:none;border-radius:8px;color:#0a0a0a;font-weight:700;font-size:13px;cursor:pointer;transition:.15s}
+.btn:hover{filter:brightness(1.1)}
+.btn.sm{padding:6px 11px;font-size:12px}
+.btn.ok{background:linear-gradient(145deg,#34D399,#4FD1C5)}
+.btn.sec{background:#1a1d26;color:var(--txt);border:1px solid var(--line)}
+.btn.sec:hover{border-color:var(--dim2);background:#20262f}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);padding:10px 8px;border-bottom:1px solid var(--line)}
+tbody td{padding:10px 8px;border-bottom:1px solid #1a1d26}
+.badge{display:inline-block;padding:4px 8px;border-radius:6px;font:600 11px var(--mono);text-transform:uppercase}
+.badge.pending{background:#2d2410;color:var(--warn)}
+.badge.paid{background:#0f2420;color:var(--ok)}
+.mono{font-family:var(--mono);font-size:13px}
+input[type="checkbox"]{width:16px;height:16px;cursor:pointer}
+.kpis{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:18px}
+.kpi{background:#0e1116;border:1px solid var(--line);border-radius:10px;padding:13px 15px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--acc)}
+.kpi.ok::before{background:var(--ok)}
+.kpi.warn::before{background:var(--warn)}
+.kpi .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);font-weight:700}
+.kpi .big{font:700 22px var(--mono);letter-spacing:-.02em;margin-top:6px}
+.kpi.ok .big{color:var(--ok)}
+.kpi.warn .big{color:var(--warn)}
+.empty{text-align:center;padding:40px;color:var(--dim2);font-size:14px}
+.actions{display:flex;gap:8px;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="logo">R</div>
+    <div>
+      <h1>Admin Panel · Afiliados</h1>
+      <div style="font-size:13px;color:var(--dim);margin-top:2px">Resuelve-API</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('affiliates')">Afiliados</button>
+      <button class="tab" onclick="showTab('pending')">Pendientes</button>
+    </div>
+  </div>
+
+  <div id="affiliates-tab">
+    <div class="kpis">
+      <div class="kpi">
+        <div class="lbl">Total Afiliados</div>
+        <div class="big" id="total-aff">0</div>
+      </div>
+      <div class="kpi warn">
+        <div class="lbl">Pendiente Pago</div>
+        <div class="big" id="total-pending">$0</div>
+      </div>
+      <div class="kpi ok">
+        <div class="lbl">Total Pagado</div>
+        <div class="big" id="total-paid">$0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="h2">Todos los Afiliados</div>
+      <div id="affiliates-list"></div>
+    </div>
+  </div>
+
+  <div id="pending-tab" style="display:none">
+    <div class="card">
+      <div class="h2">
+        <span>Comisiones Pendientes de Pago</span>
+        <button class="btn sm ok" style="margin-left:auto" onclick="markSelectedPaid()">
+          Marcar Seleccionadas como Pagadas
+        </button>
+      </div>
+      <div class="actions">
+        <button class="btn sec sm" onclick="selectAll()">Seleccionar Todo</button>
+        <button class="btn sec sm" onclick="deselectAll()">Deseleccionar</button>
+        <button class="btn sec sm" onclick="exportCSV()">Exportar CSV</button>
+      </div>
+      <div id="pending-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://affiliate-api.resuelve-api.lat/api';
+const ADMIN_TOKEN = prompt('Admin Token:');
+
+async function req(path) {
+  const res = await fetch(API_URL + path, {
+    headers: {
+      'Authorization': `Bearer ${ADMIN_TOKEN}`
+    }
+  });
+  if (!res.ok) throw new Error('Request failed');
+  return await res.json();
+}
+
+let affiliatesData = [];
+let pendingData = [];
+
+async function loadAffiliates() {
+  try {
+    const data = await req('/admin/affiliates');
+    affiliatesData = data.affiliates;
+
+    const totalPending = affiliatesData.reduce((s, a) => s + (a.pending || 0), 0);
+    const totalPaid = affiliatesData.reduce((s, a) => s + (a.paid || 0), 0);
+
+    document.getElementById('total-aff').textContent = affiliatesData.length;
+    document.getElementById('total-pending').textContent = '$' + (totalPending / 500000).toFixed(2);
+    document.getElementById('total-paid').textContent = '$' + (totalPaid / 500000).toFixed(2);
+
+    document.getElementById('affiliates-list').innerHTML = affiliatesData.length ? `
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Código</th>
+            <th>Referidos</th>
+            <th>Pendiente</th>
+            <th>Pagado</th>
+            <th>Wallet</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${affiliatesData.map(a => `
+            <tr>
+              <td class="mono">${a.id}</td>
+              <td>${a.username}</td>
+              <td class="mono">${a.email || '-'}</td>
+              <td class="mono" style="color:var(--acc)">${a.aff_code}</td>
+              <td>${a.aff_count}</td>
+              <td class="mono">$${(a.pending / 500000).toFixed(2)}</td>
+              <td class="mono">$${(a.paid / 500000).toFixed(2)}</td>
+              <td class="mono" style="font-size:11px">${a.wallet_address || '-'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    ` : '<div class="empty">Sin afiliados</div>';
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function loadPending() {
+  try {
+    const data = await req('/admin/commissions/pending');
+    pendingData = data.commissions;
+
+    document.getElementById('pending-list').innerHTML = pendingData.length ? `
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="select-all" onchange="toggleSelectAll()"></th>
+            <th>ID</th>
+            <th>Afiliado</th>
+            <th>Email</th>
+            <th>Wallet</th>
+            <th>Monto</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingData.map(c => `
+            <tr>
+              <td><input type="checkbox" class="comm-check" value="${c.id}"></td>
+              <td class="mono">${c.id}</td>
+              <td>${c.inviter_name}</td>
+              <td class="mono">${c.inviter_email}</td>
+              <td class="mono" style="font-size:11px">${c.wallet_address || '-'}</td>
+              <td class="mono">$${(c.amount / 500000).toFixed(2)}</td>
+              <td class="mono">${new Date(c.created_at * 1000).toLocaleDateString('es')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    ` : '<div class="empty">Sin comisiones pendientes</div>';
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+
+  document.getElementById('affiliates-tab').style.display = tab === 'affiliates' ? 'block' : 'none';
+  document.getElementById('pending-tab').style.display = tab === 'pending' ? 'block' : 'none';
+
+  if (tab === 'pending' && pendingData.length === 0) loadPending();
+}
+
+function toggleSelectAll() {
+  const checked = document.getElementById('select-all').checked;
+  document.querySelectorAll('.comm-check').forEach(c => c.checked = checked);
+}
+
+function selectAll() {
+  document.querySelectorAll('.comm-check').forEach(c => c.checked = true);
+}
+
+function deselectAll() {
+  document.querySelectorAll('.comm-check').forEach(c => c.checked = false);
+}
+
+async function markSelectedPaid() {
+  const selected = [...document.querySelectorAll('.comm-check:checked')].map(c => parseInt(c.value));
+  if (!selected.length) return alert('Selecciona al menos una comisión');
+
+  if (!confirm(`Marcar ${selected.length} comisiones como pagadas?`)) return;
+
+  try {
+    await fetch(API_URL + '/admin/commissions/mark-paid', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${ADMIN_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({commission_ids: selected})
+    });
+
+    alert('Comisiones marcadas como pagadas');
+    loadPending();
+    loadAffiliates();
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+function exportCSV() {
+  const selected = [...document.querySelectorAll('.comm-check:checked')];
+  const data = selected.length
+    ? pendingData.filter(c => selected.some(s => parseInt(s.value) === c.id))
+    : pendingData;
+
+  if (!data.length) return alert('Sin datos para exportar');
+
+  const csv = [
+    ['ID', 'Afiliado', 'Email', 'Wallet', 'Monto USD', 'Fecha'].join(','),
+    ...data.map(c => [
+      c.id,
+      c.inviter_name,
+      c.inviter_email,
+      c.wallet_address || '',
+      (c.amount / 500000).toFixed(2),
+      new Date(c.created_at * 1000).toISOString().split('T')[0]
+    ].join(','))
+  ].join('\n');
+
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `comisiones_pendientes_${Date.now()}.csv`;
+  a.click();
+}
+
+loadAffiliates();
+</script>
+
+</body>
+</html>
