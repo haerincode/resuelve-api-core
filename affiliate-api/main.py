@@ -36,21 +36,25 @@ app.add_middleware(
 )
 
 # Static files
+from pathlib import Path
+
+STATIC_DIR = Path(__file__).parent
+
 @app.get("/dashboard.html")
 async def serve_dashboard():
-    return FileResponse("dashboard.html")
+    return FileResponse(STATIC_DIR / "dashboard.html")
 
 @app.get("/admin.html")
 async def serve_admin():
-    return FileResponse("admin.html")
+    return FileResponse(STATIC_DIR / "admin.html")
 
 @app.get("/affiliates")
 async def serve_affiliates():
-    return FileResponse("affiliates.html")
+    return FileResponse(STATIC_DIR / "affiliates.html")
 
 @app.get("/")
 async def root():
-    return FileResponse("affiliates.html")
+    return FileResponse(STATIC_DIR / "affiliates.html")
 
 def get_db():
     conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
