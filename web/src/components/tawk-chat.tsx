@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { useUserStore } from '@/store';
+import { useAuthStore } from '@/stores/auth-store';
 
 export function TawkChat() {
-  const { user } = useUserStore();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     // Only load Tawk if user is authenticated
