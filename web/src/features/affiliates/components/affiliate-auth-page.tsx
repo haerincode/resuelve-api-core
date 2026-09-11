@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAffiliateAuth } from '../hooks/use-affiliate-auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { Mail, Lock, Wallet, User, MessageCircle } from 'lucide-react';
 
 export function AffiliateAuthPage() {
