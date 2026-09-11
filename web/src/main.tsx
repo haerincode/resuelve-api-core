@@ -38,6 +38,7 @@ import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
+import { TawkChat } from './components/tawk-chat'
 import './i18n/config'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
@@ -176,6 +177,7 @@ if (!rootElement.innerHTML) {
           <FontProvider>
             <DirectionProvider>
               <RouterProvider router={router} />
+              <TawkChat />
             </DirectionProvider>
           </FontProvider>
         </ThemeProvider>
