@@ -448,6 +448,29 @@ func EpayNotify(c *gin.Context) {
 	}
 	logger.LogInfo(c.Request.Context(), fmt.Sprintf("易支付 webhook 验签成功 trade_no=%s callback_type=%s trade_status=%s client_ip=%s verify_info=%q", verifyInfo.ServiceTradeNo, verifyInfo.Type, verifyInfo.TradeStatus, c.ClientIP(), common.GetJsonString(verifyInfo)))
 
+	// Validate webhook timestamp if available and check for replay attacks
+	// Common Epay timestamp fields: time, create_time, or timestamp (in seconds or milliseconds)
+	for _, timeFieldName := range []string{"time", "create_time", "timestamp"} {
+		if timeStr, ok := params[timeFieldName]; ok && timeStr != "" {
+			if err := common.ValidateWebhookTimestampFromString(timeStr); err != nil {
+				logger.LogWarn(c.Request.Context(), fmt.Sprintf("易支付 webhook 时间戳验证失败 field=%s trade_no=%s client_ip=%s error=%q", timeFieldName, verifyInfo.ServiceTradeNo, c.ClientIP(), err.Error()))
+				_, _ = c.Writer.Write([]byte("fail"))
+				return
+			}
+			break
+		}
+	}
+
+	// Check for replay attacks using a composite key
+	eventID := fmt.Sprintf("epay:%s:%s", verifyInfo.ServiceTradeNo, verifyInfo.Type)
+	if err := common.CheckAndMarkWebhookProcessed(eventID); err != nil {
+		logger.LogWarn(c.Request.Context(), fmt.Sprintf("易支付 webhook 重放攻击检测 trade_no=%s callback_type=%s client_ip=%s error=%q", verifyInfo.ServiceTradeNo, verifyInfo.Type, c.ClientIP(), err.Error()))
+		if _, writeErr := c.Writer.Write([]byte("fail")); writeErr != nil {
+			logger.LogError(c.Request.Context(), fmt.Sprintf("易支付 webhook 响应写入失败 trade_no=%s client_ip=%s error=%q", verifyInfo.ServiceTradeNo, c.ClientIP(), writeErr.Error()))
+		}
+		return
+	}
+
 	if verifyInfo.TradeStatus == epay.StatusTradeSuccess {
 		// 进程内锁只是优化；重复/并发回调的正确性由 RechargeEpay 的
 		// 数据库行锁 + 事务内状态校验保证（多实例部署下同样安全）。

@@ -215,7 +215,11 @@ func RechargeEpay(tradeNo string, actualPaymentMethod string, callerIp string) (
 		if err := tx.Save(topUp).Error; err != nil {
 			return err
 		}
-		return creditTopUpQuota(tx, topUp.UserId, quotaToAdd, nil)
+		if err := creditTopUpQuota(tx, topUp.UserId, quotaToAdd, nil); err != nil {
+			return err
+		}
+		// Record affiliate commission WITHIN transaction to prevent race conditions
+		return RecordAffiliateCommissionTx(tx, topUp.UserId, topUp.Money)
 	})
 	if err != nil {
 		if !errors.Is(err, ErrTopUpNotFound) && !errors.Is(err, ErrPaymentMethodMismatch) && !errors.Is(err, ErrTopUpStatusInvalid) {
@@ -231,8 +235,7 @@ func RechargeEpay(tradeNo string, actualPaymentMethod string, callerIp string) (
 	common.SysLog(fmt.Sprintf("易支付充值成功 trade_no=%s user_id=%d quota_to_add=%d money=%.2f", topUp.TradeNo, topUp.UserId, quotaToAdd, topUp.Money))
 	RecordTopupLog(topUp.UserId, fmt.Sprintf("使用在线充值成功，充值金额: %v，支付金额：%f", logger.LogQuota(quotaToAdd), topUp.Money), callerIp, topUp.PaymentMethod, PaymentProviderEpay)
 
-	// Trigger affiliate commission
-	go RecordAffiliateCommission(topUp.UserId, topUp.Money)
+	// Affiliate commission already recorded within transaction above
 
 	return false, nil
 }
@@ -277,9 +280,13 @@ func Recharge(referenceId string, customerId string, callerIp string) (err error
 		if err != nil || quota <= 0 {
 			return ErrInvalidTopUpQuota
 		}
-		return creditTopUpQuota(tx, topUp.UserId, quota, map[string]interface{}{
+		if err := creditTopUpQuota(tx, topUp.UserId, quota, map[string]interface{}{
 			"stripe_customer": customerId,
-		})
+		}); err != nil {
+			return err
+		}
+		// Record affiliate commission WITHIN transaction
+		return RecordAffiliateCommissionTx(tx, topUp.UserId, topUp.Money)
 	})
 
 	if err != nil {
@@ -290,8 +297,7 @@ func Recharge(referenceId string, customerId string, callerIp string) (err error
 
 	RecordTopupLog(topUp.UserId, fmt.Sprintf("使用在线充值成功，充值金额: %v，支付金额：%d", logger.FormatQuota(quota), topUp.Amount), callerIp, topUp.PaymentMethod, PaymentMethodStripe)
 
-	// Trigger affiliate commission
-	go RecordAffiliateCommission(topUp.UserId, topUp.Money)
+	// Affiliate commission already recorded within transaction
 
 	return nil
 }
@@ -587,7 +593,11 @@ func RechargeCreem(referenceId string, customerEmail string, customerName string
 			}
 		}
 
-		return creditTopUpQuota(tx, topUp.UserId, quota, updateFields)
+		if err := creditTopUpQuota(tx, topUp.UserId, quota, updateFields); err != nil {
+			return err
+		}
+		// Record affiliate commission WITHIN transaction (Creem)
+		return RecordAffiliateCommissionTx(tx, topUp.UserId, topUp.Money)
 	})
 
 	if err != nil {
@@ -598,8 +608,7 @@ func RechargeCreem(referenceId string, customerEmail string, customerName string
 
 	RecordTopupLog(topUp.UserId, fmt.Sprintf("使用Creem充值成功，充值额度: %v，支付金额：%.2f", quota, topUp.Money), callerIp, topUp.PaymentMethod, PaymentMethodCreem)
 
-	// Trigger affiliate commission
-	go RecordAffiliateCommission(topUp.UserId, topUp.Money)
+	// Affiliate commission already recorded within transaction
 
 	return nil
 }
@@ -648,7 +657,11 @@ func RechargeWaffo(tradeNo string, callerIp string) (err error) {
 			return err
 		}
 
-		return creditTopUpQuota(tx, topUp.UserId, quotaToAdd, nil)
+		if err := creditTopUpQuota(tx, topUp.UserId, quotaToAdd, nil); err != nil {
+			return err
+		}
+		// Record affiliate commission WITHIN transaction (Waffo)
+		return RecordAffiliateCommissionTx(tx, topUp.UserId, topUp.Money)
 	})
 
 	if err != nil {
@@ -661,8 +674,7 @@ func RechargeWaffo(tradeNo string, callerIp string) (err error) {
 		RecordTopupLog(topUp.UserId, fmt.Sprintf("Waffo充值成功，充值额度: %v，支付金额: %.2f", logger.FormatQuota(quotaToAdd), topUp.Money), callerIp, topUp.PaymentMethod, PaymentMethodWaffo)
 	}
 
-	// Trigger affiliate commission
-	go RecordAffiliateCommission(topUp.UserId, topUp.Money)
+	// Affiliate commission already recorded within transaction
 
 	return nil
 }
@@ -711,7 +723,11 @@ func RechargeWaffoPancake(tradeNo string) (err error) {
 			return err
 		}
 
-		return creditTopUpQuota(tx, topUp.UserId, quotaToAdd, nil)
+		if err := creditTopUpQuota(tx, topUp.UserId, quotaToAdd, nil); err != nil {
+			return err
+		}
+		// Record affiliate commission WITHIN transaction (Waffo Pancake)
+		return RecordAffiliateCommissionTx(tx, topUp.UserId, topUp.Money)
 	})
 
 	if err != nil {
@@ -724,8 +740,7 @@ func RechargeWaffoPancake(tradeNo string) (err error) {
 		RecordLog(topUp.UserId, LogTypeTopup, fmt.Sprintf("Waffo Pancake充值成功，充值额度: %v，支付金额: %.2f", logger.FormatQuota(quotaToAdd), topUp.Money))
 	}
 
-	// Trigger affiliate commission
-	go RecordAffiliateCommission(topUp.UserId, topUp.Money)
+	// Affiliate commission already recorded within transaction
 
 	return nil
 }

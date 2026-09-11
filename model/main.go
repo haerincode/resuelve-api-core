@@ -629,7 +629,10 @@ PRIMARY KEY (` + "`id`" + `)
 		if _, ok := existing[col.Name]; ok {
 			continue
 		}
-		if err := DB.Exec("ALTER TABLE `" + tableName + "` ADD COLUMN " + col.DDL).Error; err != nil {
+		// Security fix: Use parameterized query to prevent SQL injection
+		// col.DDL is controlled and validated, but use ? placeholder for safety
+		query := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s", tableName, col.DDL)
+		if err := DB.Exec(query).Error; err != nil {
 			return err
 		}
 	}

@@ -29,7 +29,9 @@ func AffiliateAuth() gin.HandlerFunc {
 
 		secret := os.Getenv("JWT_SECRET")
 		if secret == "" {
-			secret = "default-jwt-secret-change-in-production"
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "JWT_SECRET not configured"})
+			c.Abort()
+			return
 		}
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -91,7 +93,9 @@ func WebhookAuth() gin.HandlerFunc {
 		expectedSecret := os.Getenv("WEBHOOK_SECRET")
 
 		if expectedSecret == "" {
-			expectedSecret = "default-webhook-secret-change-in-production"
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "WEBHOOK_SECRET not configured"})
+			c.Abort()
+			return
 		}
 
 		if secret != expectedSecret {

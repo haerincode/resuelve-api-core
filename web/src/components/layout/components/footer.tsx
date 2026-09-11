@@ -76,13 +76,11 @@ function FooterLinkItem(props: { link: FooterLink }) {
   )
 }
 
-// Renders User Agreement / Privacy Policy links inline with the parent's
-// copyright row when either is configured in System Settings → Site. Emits
-// fragmented siblings so the parent flex container's gap controls spacing.
 function LegalLinks(props: { leadingSeparator?: boolean }) {
   const { t } = useTranslation()
   const { status } = useStatus()
   const items: { key: string; label: string; href: string }[] = []
+
   if (status?.user_agreement_enabled) {
     items.push({
       key: 'user-agreement',
@@ -97,6 +95,19 @@ function LegalLinks(props: { leadingSeparator?: boolean }) {
       href: '/privacy-policy',
     })
   }
+
+  items.push({
+    key: 'terms',
+    label: t('Terms & Conditions'),
+    href: '/terms',
+  })
+
+  items.push({
+    key: 'contact',
+    label: t('Contact'),
+    href: '/contact',
+  })
+
   if (items.length === 0) {
     return null
   }
@@ -121,8 +132,6 @@ function LegalLinks(props: { leadingSeparator?: boolean }) {
   )
 }
 
-// inline=true returns just the inner span for composition in a parent flex
-// row. inline=false wraps in a centered/right-aligned div (default).
 function ProjectAttribution(props: { currentYear: number; inline?: boolean }) {
   const { t } = useTranslation()
   const content = (
@@ -174,7 +183,7 @@ export function Footer(props: FooterProps) {
           },
           {
             text: t('footer.columns.about.links.contact'),
-            href: 'https://docs.newapi.pro/support/community-interaction/',
+            href: '/contact',
           },
           {
             text: t('footer.columns.about.links.features'),
@@ -200,19 +209,19 @@ export function Footer(props: FooterProps) {
         ],
       },
       {
-        title: t('footer.columns.related.title'),
+        title: t('footer.columns.legal.title'),
         links: [
           {
-            text: t('footer.columns.related.links.oneApi'),
-            href: 'https://github.com/songquanpeng/one-api',
+            text: t('footer.columns.legal.links.terms'),
+            href: '/terms',
           },
           {
-            text: t('footer.columns.related.links.midjourney'),
-            href: 'https://github.com/novicezk/midjourney-proxy',
+            text: t('footer.columns.legal.links.privacy'),
+            href: '/privacy-policy',
           },
           {
-            text: t('footer.columns.related.links.newApiKeyTool'),
-            href: 'https://github.com/Calcium-Ion/new-api-key-tool',
+            text: t('footer.columns.legal.links.contact'),
+            href: '/contact',
           },
         ],
       },
@@ -252,7 +261,6 @@ export function Footer(props: FooterProps) {
     >
       <div className='mx-auto max-w-6xl px-6 py-12 md:py-16'>
         <div className='flex flex-col justify-between gap-10 md:flex-row md:gap-16'>
-          {/* Brand column */}
           <div className='shrink-0'>
             <Link to='/' className='group flex items-center gap-2.5'>
               <img
@@ -269,7 +277,6 @@ export function Footer(props: FooterProps) {
             </p>
           </div>
 
-          {/* Links columns */}
           {isDemoSiteMode && (
             <div className='grid grid-cols-3 gap-8 md:gap-16'>
               {displayColumns.map((column, index) => (
@@ -290,10 +297,7 @@ export function Footer(props: FooterProps) {
           )}
         </div>
 
-        {/* Copyright + optional legal links inline on the left, project
-            attribution on the right; wraps on narrow screens. */}
         <div className='border-border/30 mt-12 border-t pt-6'>
-          {/* Legal Disclaimer */}
           <div className='bg-muted/30 mb-6 rounded-lg border p-4'>
             <h4 className='text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wide'>
               {t('footer.legal.title')}

@@ -3,11 +3,13 @@ package controller
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/model"
@@ -18,11 +20,44 @@ import (
 
 type AffiliateRegisterRequest struct {
 	Email           string `json:"email" binding:"required,email"`
-	Password        string `json:"password" binding:"required,min=8"`
+	Password        string `json:"password" binding:"required,min=12"` // Changed to min=12
 	UsdtWallet      string `json:"usdt_wallet" binding:"required"`
 	FullName        string `json:"full_name"`
 	TelegramHandle  string `json:"telegram_handle"`
 	AffCode         string `json:"aff_code"`
+}
+
+// validatePasswordStrength validates password complexity
+func validatePasswordStrength(password string) error {
+	if len(password) < 12 {
+		return fmt.Errorf("password must be at least 12 characters")
+	}
+
+	var (
+		hasUpper   = false
+		hasLower   = false
+		hasNumber  = false
+		hasSpecial = false
+	)
+
+	for _, char := range password {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsLower(char):
+			hasLower = true
+		case unicode.IsDigit(char):
+			hasNumber = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			hasSpecial = true
+		}
+	}
+
+	if !hasUpper || !hasLower || !hasNumber || !hasSpecial {
+		return fmt.Errorf("password must contain uppercase, lowercase, number, and special character")
+	}
+
+	return nil
 }
 
 type AffiliateLoginRequest struct {
@@ -96,7 +131,7 @@ func GetUserAffiliateToken(c *gin.Context) {
 func generateJWT(affiliateID int, email string) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		secret = "default-jwt-secret-change-in-production"
+		return "", fmt.Errorf("JWT_SECRET environment variable is not set - required for affiliate authentication")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -119,6 +154,12 @@ func RegisterAffiliate(c *gin.Context) {
 	var existing model.Affiliate
 	if err := model.DB.Where("email = ?", req.Email).First(&existing).Error; err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Email already registered"})
+		return
+	}
+
+	// Validate password strength
+	if err := validatePasswordStrength(req.Password); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -204,9 +245,21 @@ func GetAffiliateDashboard(c *gin.Context) {
 		return
 	}
 
-	// Count referred users
+	// Find the user_id that matches this affiliate's email
+	var affiliateUserID int
+	if err := model.DB.Model(&model.User{}).
+		Select("id").
+		Where("email = ?", affiliate.Email).
+		Scan(&affiliateUserID).Error; err != nil || affiliateUserID == 0 {
+		// Affiliate email doesn't match any user, so no referrals
+		affiliateUserID = 0
+	}
+
+	// Count referred users using the user_id, not affiliate_id
 	var referredCount int64
-	model.DB.Model(&model.User{}).Where("inviter_id = ?", affiliateID).Count(&referredCount)
+	if affiliateUserID > 0 {
+		model.DB.Model(&model.User{}).Where("inviter_id = ?", affiliateUserID).Count(&referredCount)
+	}
 
 	// Sum commissions
 	var totalEarned, totalPending float64

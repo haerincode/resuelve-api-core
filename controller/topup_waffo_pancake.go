@@ -475,6 +475,21 @@ func WaffoPancakeWebhook(c *gin.Context) {
 	}
 
 	logger.LogInfo(c.Request.Context(), fmt.Sprintf("Waffo Pancake webhook 验签成功 event_type=%s event_id=%s order_id=%s client_ip=%s", event.NormalizedEventType(), event.ID, event.Data.OrderID, c.ClientIP()))
+
+	// Validate webhook timestamp (reject if > 5 minutes old)
+	if err := common.ValidateWebhookTimestampFromString(event.Timestamp); err != nil {
+		logger.LogWarn(c.Request.Context(), fmt.Sprintf("Waffo Pancake webhook 时间戳验证失败 event_id=%s order_id=%s client_ip=%s error=%q", event.ID, event.Data.OrderID, c.ClientIP(), err.Error()))
+		c.String(http.StatusBadRequest, "invalid timestamp")
+		return
+	}
+
+	// Check for replay attacks using Redis deduplication
+	if err := common.CheckAndMarkWebhookProcessed(event.ID); err != nil {
+		logger.LogWarn(c.Request.Context(), fmt.Sprintf("Waffo Pancake webhook 重放攻击检测 event_id=%s order_id=%s client_ip=%s error=%q", event.ID, event.Data.OrderID, c.ClientIP(), err.Error()))
+		c.String(http.StatusBadRequest, "duplicate event")
+		return
+	}
+
 	if event.NormalizedEventType() != "order.completed" {
 		c.String(http.StatusOK, "OK")
 		return

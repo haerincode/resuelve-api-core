@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" id="meta-desc" content="">
+    <meta name="keywords" content="programa afiliados API IA, comisiones USDT, referidos Claude API, ganar dinero API GPT, afiliados inteligencia artificial, comisiones criptomonedas, API gateway afiliados">
+    <meta name="author" content="Resuelve API">
+    <meta property="og:title" id="og-title" content="">
+    <meta property="og:description" id="og-desc" content="">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resuelve-api.lat/affiliates">
+    <title id="page-title"></title>
+    <script>
+        const lang = (navigator.language || navigator.userLanguage).startsWith('es') ? 'es' : 'en';
+        const t = {
+            es: {
+                metaDesc: 'Únete al programa de afiliados de Resuelve API y gana 30% de comisión en USDT por cada cliente. Sistema automático de referidos para APIs de IA: Claude, GPT-4, Gemini. Pagos en criptomonedas, sin límites de ganancias.',
+                ogTitle: 'Programa de Afiliados Resuelve API - Gana 30% en USDT',
+                ogDesc: 'Gana comisiones automáticas del 30% en USDT refiriendo clientes a la mejor plataforma de APIs de IA. Sin límites, pagos automáticos.',
+                pageTitle: 'Programa de Afiliados - Gana 30% Comisión USDT | Resuelve API',
+                heroTitle: 'Programa de Afiliados Resuelve API',
+                heroText: 'Gana <strong>30% de comisión en USDT</strong> por cada cliente que traigas. Sistema automático de referidos para la mejor plataforma de APIs de inteligencia artificial.',
+                ctaStart: 'Comenzar Ahora',
+                ctaDashboard: 'Ver Dashboard',
+                statsNoLimit: 'Sin Límite de Ganancias',
+                statsAuto: 'Pagos Automáticos',
+                statsRecurring: 'Comisiones Recurrentes',
+                statsSupport: 'Soporte Dedicado',
+                feature1Title: '🚀 Comisiones Recurrentes',
+                feature1Text: 'Gana el 30% cada vez que tus referidos recarguen saldo. No es una comisión única: mientras ellos usen Resuelve API, tú sigues ganando. Sistema de ingresos pasivos real.',
+                feature2Title: '💰 Pagos Automáticos en USDT',
+                feature2Text: 'Recibe tus comisiones en USDT (TRC20) directo a tu wallet. Sin intermediarios, sin comisiones bancarias, sin esperas. Tú decides cuándo retirar.',
+                feature3Title: '📊 Dashboard en Tiempo Real',
+                feature3Text: 'Monitorea tus referidos, comisiones pendientes, pagos realizados y estadísticas completas desde tu panel personal. Transparencia total.',
+                feature4Title: '🔗 Link Único de Referido',
+                feature4Text: 'Obtén tu enlace personalizado con código de tracking. Compatible con cualquier canal: redes sociales, blogs, YouTube, Telegram, Discord, o tu propia web.',
+                feature5Title: '🎯 Audiencia de Alto Valor',
+                feature5Text: 'Desarrolladores, empresas tech, startups de IA. Clientes que gastan desde $10 hasta $1000+ mensuales en APIs. Una sola referencia puede generar cientos de dólares.',
+                feature6Title: '🛠️ Recursos de Marketing',
+                feature6Text: 'Acceso a banners, copy examples, guías de integración, y soporte dedicado para maximizar tus conversiones. Te ayudamos a crecer.',
+                howWorksTitle: 'Cómo Funciona en 4 Pasos',
+                step1: 'Regístrate',
+                step1Text: 'Crea tu cuenta de afiliado en 30 segundos. Solo email y contraseña.',
+                step2: 'Obtén tu Link',
+                step2Text: 'Recibe tu enlace único de referido con código de tracking automático.',
+                step3: 'Comparte',
+                step3Text: 'Promociona Resuelve API en tus redes, comunidades, blog o donde tengas audiencia.',
+                step4: 'Gana USDT',
+                step4Text: 'Cada vez que alguien recargue usando tu código, recibes 30% en comisión.',
+                faqTitle: 'Preguntas Frecuentes',
+                faq1Q: '¿Cuánto puedo ganar realmente?',
+                faq1A: 'No hay límite. Depende de cuántos clientes traigas y cuánto gasten. Ejemplo: Si refieres 10 clientes que recargan $50/mes cada uno, ganas $150/mes recurrente (30% de $500). Si traes empresas que gastan $500+, tus comisiones escalan proporcionalmente. Afiliados top ganan $500-2000+ mensuales.',
+                faq2Q: '¿Cómo y cuándo recibo los pagos?',
+                faq2A: 'Las comisiones se acumulan automáticamente en tu dashboard. Puedes solicitar retiro cuando quieras (sin mínimo). Pagamos en USDT (TRC20) a tu wallet en 24-48 horas. Configura tu dirección USDT desde tu panel de afiliado.',
+                faq3Q: '¿Qué es Resuelve API y por qué mis referidos lo usarían?',
+                faq3A: 'Resuelve API es un gateway que agrega +40 proveedores de IA (Claude, GPT-4, Gemini, Llama, etc.) en una sola API unificada. Desarrolladores y empresas lo usan porque es más barato que ir directo a OpenAI/Anthropic, tiene mejor uptime (failover automático), y soporta modelos que individualmente no tendrían acceso. Es la solución técnica seria para quien construye con IA.',
+                faq4Q: '¿Necesito experiencia técnica?',
+                faq4A: 'No. Solo necesitas una audiencia que pueda beneficiarse de APIs de IA: desarrolladores, community managers, creadores de contenido tech, grupos de Discord/Telegram. Si puedes compartir un link, puedes ser afiliado.',
+                ctaFinal: '¿Listo para Empezar?',
+                ctaFinalText: 'Crea tu cuenta de afiliado ahora y obtén tu enlace de referido en menos de 1 minuto. Sin costos, sin riesgos, solo oportunidad.'
+            },
+            en: {
+                metaDesc: 'Join Resuelve API affiliate program and earn 30% commission in USDT for each client. Automatic referral system for AI APIs: Claude, GPT-4, Gemini. Crypto payments, no earning limits.',
+                ogTitle: 'Resuelve API Affiliate Program - Earn 30% in USDT',
+                ogDesc: 'Earn automatic 30% commissions in USDT by referring clients to the best AI API platform. No limits, automatic payments.',
+                pageTitle: 'Affiliate Program - Earn 30% USDT Commission | Resuelve API',
+                heroTitle: 'Resuelve API Affiliate Program',
+                heroText: 'Earn <strong>30% commission in USDT</strong> for every client you bring. Automatic referral system for the best artificial intelligence API platform.',
+                ctaStart: 'Start Now',
+                ctaDashboard: 'View Dashboard',
+                statsNoLimit: 'No Earning Limits',
+                statsAuto: 'Automatic Payments',
+                statsRecurring: 'Recurring Commissions',
+                statsSupport: 'Dedicated Support',
+                feature1Title: '🚀 Recurring Commissions',
+                feature1Text: 'Earn 30% every time your referrals reload balance. Not a one-time commission: as long as they use Resuelve API, you keep earning. Real passive income system.',
+                feature2Title: '💰 Automatic USDT Payments',
+                feature2Text: 'Receive your commissions in USDT (TRC20) directly to your wallet. No intermediaries, no bank fees, no waiting. You decide when to withdraw.',
+                feature3Title: '📊 Real-Time Dashboard',
+                feature3Text: 'Monitor your referrals, pending commissions, completed payments and full statistics from your personal panel. Total transparency.',
+                feature4Title: '🔗 Unique Referral Link',
+                feature4Text: 'Get your personalized link with tracking code. Compatible with any channel: social media, blogs, YouTube, Telegram, Discord, or your own website.',
+                feature5Title: '🎯 High-Value Audience',
+                feature5Text: 'Developers, tech companies, AI startups. Clients spending from $10 to $1000+ monthly on APIs. A single referral can generate hundreds of dollars.',
+                feature6Title: '🛠️ Marketing Resources',
+                feature6Text: 'Access to banners, copy examples, integration guides, and dedicated support to maximize your conversions. We help you grow.',
+                howWorksTitle: 'How It Works in 4 Steps',
+                step1: 'Sign Up',
+                step1Text: 'Create your affiliate account in 30 seconds. Just email and password.',
+                step2: 'Get Your Link',
+                step2Text: 'Receive your unique referral link with automatic tracking code.',
+                step3: 'Share',
+                step3Text: 'Promote Resuelve API on your networks, communities, blog or wherever you have an audience.',
+                step4: 'Earn USDT',
+                step4Text: 'Every time someone reloads using your code, you receive 30% commission.',
+                faqTitle: 'Frequently Asked Questions',
+                faq1Q: 'How much can I really earn?',
+                faq1A: 'No limit. It depends on how many clients you bring and how much they spend. Example: If you refer 10 clients who reload $50/month each, you earn $150/month recurring (30% of $500). If you bring companies spending $500+, your commissions scale proportionally. Top affiliates earn $500-2000+ monthly.',
+                faq2Q: 'How and when do I receive payments?',
+                faq2A: 'Commissions accumulate automatically in your dashboard. You can request withdrawal whenever you want (no minimum). We pay in USDT (TRC20) to your wallet within 24-48 hours. Set up your USDT address from your affiliate panel.',
+                faq3Q: 'What is Resuelve API and why would my referrals use it?',
+                faq3A: 'Resuelve API is a gateway that aggregates +40 AI providers (Claude, GPT-4, Gemini, Llama, etc.) into a single unified API. Developers and companies use it because it is cheaper than going directly to OpenAI/Anthropic, has better uptime (automatic failover), and supports models they would not individually have access to. It is the serious technical solution for those building with AI.',
+                faq4Q: 'Do I need technical experience?',
+                faq4A: 'No. You just need an audience that can benefit from AI APIs: developers, community managers, tech content creators, Discord/Telegram groups. If you can share a link, you can be an affiliate.',
+                ctaFinal: 'Ready to Start?',
+                ctaFinalText: 'Create your affiliate account now and get your referral link in less than 1 minute. No costs, no risks, just opportunity.'
+            }
+        };
+        function tr(key) { return t[lang][key] || key; }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0B0E14;
+            color: #F8FAFC;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        header {
+            background: #0F172A;
+            border-bottom: 1px solid #1E293B;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { font-size: 24px; font-weight: 700; color: #22D3EE; }
+        .cta-btn {
+            background: linear-gradient(135deg, #22D3EE, #38BDF8);
+            color: #0B0E14;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(34, 211, 238, 0.3);
+        }
+        .hero {
+            text-align: center;
+            padding: 100px 20px 80px;
+            background: linear-gradient(180deg, #0F172A 0%, #0B0E14 100%);
+        }
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #22D3EE, #F8FAFC);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 20px;
+            color: #CBD5E1;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 60px auto;
+            max-width: 900px;
+        }
+        .stat-box {
+            background: #0F172A;
+            border: 1px solid #1E293B;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+        }
+        .stat-box h3 {
+            font-size: 32px;
+            color: #22D3EE;
+            margin-bottom: 8px;
+        }
+        .stat-box p { color: #94A3B8; font-size: 14px; }
+        .features {
+            padding: 80px 20px;
+            background: #0B0E14;
+        }
+        .features h2 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 60px;
+            color: #F8FAFC;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: #0F172A;
+            border: 1px solid #1E293B;
+            border-radius: 12px;
+            padding: 35px;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .feature-card:hover {
+            border-color: #22D3EE;
+            transform: translateY(-4px);
+        }
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: #F8FAFC;
+        }
+        .feature-card p {
+            color: #CBD5E1;
+            line-height: 1.7;
+        }
+        .how-works {
+            padding: 80px 20px;
+            background: #0F172A;
+        }
+        .how-works h2 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 60px;
+        }
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 30px;
+        }
+        .step {
+            text-align: center;
+            padding: 30px;
+            background: #0B0E14;
+            border: 1px solid #1E293B;
+            border-radius: 12px;
+        }
+        .step-num {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #22D3EE, #38BDF8);
+            color: #0B0E14;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 auto 20px;
+        }
+        .step h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .step p {
+            color: #94A3B8;
+            font-size: 15px;
+        }
+        .faq {
+            padding: 80px 20px;
+            background: #0B0E14;
+        }
+        .faq h2 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 50px;
+        }
+        .faq-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .faq-item {
+            background: #0F172A;
+            border: 1px solid #1E293B;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .faq-item h3 {
+            font-size: 20px;
+            color: #22D3EE;
+            margin-bottom: 12px;
+        }
+        .faq-item p {
+            color: #CBD5E1;
+            line-height: 1.8;
+        }
+        .cta-final {
+            text-align: center;
+            padding: 100px 20px;
+            background: linear-gradient(180deg, #0F172A 0%, #0B0E14 100%);
+        }
+        .cta-final h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .cta-final p {
+            font-size: 18px;
+            color: #CBD5E1;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        footer {
+            background: #0F172A;
+            border-top: 1px solid #1E293B;
+            padding: 30px 20px;
+            text-align: center;
+            color: #64748B;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 36px; }
+            .hero p { font-size: 16px; }
+            .features h2, .how-works h2, .faq h2, .cta-final h2 { font-size: 32px; }
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            document.getElementById('meta-desc').setAttribute('content', tr('metaDesc'));
+            document.getElementById('og-title').setAttribute('content', tr('ogTitle'));
+            document.getElementById('og-desc').setAttribute('content', tr('ogDesc'));
+            document.getElementById('page-title').textContent = tr('pageTitle');
+            document.getElementById('hero-title').textContent = tr('heroTitle');
+            document.getElementById('hero-text').innerHTML = tr('heroText');
+            document.getElementById('cta-start').textContent = tr('ctaStart');
+            document.getElementById('cta-dashboard').textContent = tr('ctaDashboard');
+            document.getElementById('stat1').textContent = tr('statsNoLimit');
+            document.getElementById('stat2').textContent = tr('statsAuto');
+            document.getElementById('stat3').textContent = tr('statsRecurring');
+            document.getElementById('stat4').textContent = tr('statsSupport');
+            document.getElementById('f1-title').innerHTML = tr('feature1Title');
+            document.getElementById('f1-text').textContent = tr('feature1Text');
+            document.getElementById('f2-title').innerHTML = tr('feature2Title');
+            document.getElementById('f2-text').textContent = tr('feature2Text');
+            document.getElementById('f3-title').innerHTML = tr('feature3Title');
+            document.getElementById('f3-text').textContent = tr('feature3Text');
+            document.getElementById('f4-title').innerHTML = tr('feature4Title');
+            document.getElementById('f4-text').textContent = tr('feature4Text');
+            document.getElementById('f5-title').innerHTML = tr('feature5Title');
+            document.getElementById('f5-text').textContent = tr('feature5Text');
+            document.getElementById('f6-title').innerHTML = tr('feature6Title');
+            document.getElementById('f6-text').textContent = tr('feature6Text');
+            document.getElementById('how-title').textContent = tr('howWorksTitle');
+            document.getElementById('step1').textContent = tr('step1');
+            document.getElementById('step1-text').textContent = tr('step1Text');
+            document.getElementById('step2').textContent = tr('step2');
+            document.getElementById('step2-text').textContent = tr('step2Text');
+            document.getElementById('step3').textContent = tr('step3');
+            document.getElementById('step3-text').textContent = tr('step3Text');
+            document.getElementById('step4').textContent = tr('step4');
+            document.getElementById('step4-text').textContent = tr('step4Text');
+            document.getElementById('faq-title').textContent = tr('faqTitle');
+            document.getElementById('faq1q').textContent = tr('faq1Q');
+            document.getElementById('faq1a').textContent = tr('faq1A');
+            document.getElementById('faq2q').textContent = tr('faq2Q');
+            document.getElementById('faq2a').textContent = tr('faq2A');
+            document.getElementById('faq3q').textContent = tr('faq3Q');
+            document.getElementById('faq3a').textContent = tr('faq3A');
+            document.getElementById('faq4q').textContent = tr('faq4Q');
+            document.getElementById('faq4a').textContent = tr('faq4A');
+            document.getElementById('cta-final-title').textContent = tr('ctaFinal');
+            document.getElementById('cta-final-text').textContent = tr('ctaFinalText');
+            document.getElementById('cta-start-2').textContent = tr('ctaStart');
+        };
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Resuelve API</div>
+                <a href="/affiliate-dashboard.html" class="cta-btn" id="cta-dashboard"></a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1 id="hero-title"></h1>
+            <p id="hero-text"></p>
+            <a href="/affiliate-dashboard.html" class="cta-btn" id="cta-start"></a>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <div class="stats-row">
+                <div class="stat-box">
+                    <h3>30%</h3>
+                    <p id="stat1"></p>
+                </div>
+                <div class="stat-box">
+                    <h3>USDT</h3>
+                    <p id="stat2"></p>
+                </div>
+                <div class="stat-box">
+                    <h3>♾️</h3>
+                    <p id="stat3"></p>
+                </div>
+                <div class="stat-box">
+                    <h3>24/7</h3>
+                    <p id="stat4"></p>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3 id="f1-title"></h3>
+                    <p id="f1-text"></p>
+                </div>
+                <div class="feature-card">
+                    <h3 id="f2-title"></h3>
+                    <p id="f2-text"></p>
+                </div>
+                <div class="feature-card">
+                    <h3 id="f3-title"></h3>
+                    <p id="f3-text"></p>
+                </div>
+                <div class="feature-card">
+                    <h3 id="f4-title"></h3>
+                    <p id="f4-text"></p>
+                </div>
+                <div class="feature-card">
+                    <h3 id="f5-title"></h3>
+                    <p id="f5-text"></p>
+                </div>
+                <div class="feature-card">
+                    <h3 id="f6-title"></h3>
+                    <p id="f6-text"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-works">
+        <div class="container">
+            <h2 id="how-title"></h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h3 id="step1"></h3>
+                    <p id="step1-text"></p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h3 id="step2"></h3>
+                    <p id="step2-text"></p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h3 id="step3"></h3>
+                    <p id="step3-text"></p>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <h3 id="step4"></h3>
+                    <p id="step4-text"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq">
+        <div class="container">
+            <h2 id="faq-title"></h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <h3 id="faq1q"></h3>
+                    <p id="faq1a"></p>
+                </div>
+                <div class="faq-item">
+                    <h3 id="faq2q"></h3>
+                    <p id="faq2a"></p>
+                </div>
+                <div class="faq-item">
+                    <h3 id="faq3q"></h3>
+                    <p id="faq3a"></p>
+                </div>
+                <div class="faq-item">
+                    <h3 id="faq4q"></h3>
+                    <p id="faq4a"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-final">
+        <div class="container">
+            <h2 id="cta-final-title"></h2>
+            <p id="cta-final-text"></p>
+            <a href="/affiliate-dashboard.html" class="cta-btn" id="cta-start-2"></a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Resuelve API. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

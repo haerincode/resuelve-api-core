@@ -1298,23 +1298,18 @@ func IncreaseUserQuota(id int, quota int, db bool) (err error) {
 }
 
 func increaseUserQuota(id int, quota int) (err error) {
-	result := DB.Model(&User{}).
-		Where("id = ? AND quota <= ?", id, common.MaxWalletQuota-quota).
-		Update("quota", gorm.Expr("quota + ?", quota))
-	if result.Error != nil {
-		return result.Error
-	}
-	if result.RowsAffected == 1 {
-		return nil
-	}
-	var count int64
-	if err := DB.Model(&User{}).Where("id = ?", id).Count(&count).Error; err != nil {
-		return err
-	}
-	if count == 0 {
-		return gorm.ErrRecordNotFound
-	}
-	return ErrWalletQuotaLimitExceeded
+	return DB.Transaction(func(tx *gorm.DB) error {
+		var user User
+		if err := lockForUpdate(tx).Where("id = ?", id).First(&user).Error; err != nil {
+			return err
+		}
+		if user.Quota > common.MaxWalletQuota-quota {
+			return ErrWalletQuotaLimitExceeded
+		}
+		return tx.Model(&User{}).
+			Where("id = ?", id).
+			Update("quota", gorm.Expr("quota + ?", quota)).Error
+	})
 }
 
 func DecreaseUserQuota(id int, quota int, db bool) (err error) {

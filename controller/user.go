@@ -633,6 +633,16 @@ func GetUserModels(c *gin.Context) {
 	if err != nil {
 		id = c.GetInt("id")
 	}
+	// IDOR protection: validate ownership
+	myRole := c.GetInt("role")
+	myId := c.GetInt("id")
+	if myRole < common.RoleAdminUser && id != myId {
+		c.JSON(http.StatusForbidden, gin.H{
+			"success": false,
+			"message": "无权访问其他用户的模型",
+		})
+		return
+	}
 	user, err := model.GetUserCache(id)
 	if err != nil {
 		common.ApiError(c, err)

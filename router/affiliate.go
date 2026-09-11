@@ -9,6 +9,7 @@ import (
 func SetAffiliateRouter(router *gin.Engine) {
 	affiliateRoute := router.Group("/api/affiliate")
 	affiliateRoute.Use(middleware.CORS())
+	affiliateRoute.Use(middleware.GlobalWebRateLimit())
 	{
 		// Public endpoints
 		affiliateRoute.POST("/register", controller.RegisterAffiliate)

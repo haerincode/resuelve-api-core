@@ -30,6 +30,7 @@ import {
   ServerCog,
   Settings,
   Ticket,
+  TrendingUp,
   User,
   Users,
   Wallet,
@@ -113,6 +114,11 @@ export function useSidebarData(): SidebarData {
             url: '/profile',
             icon: User,
           },
+          {
+            title: t('Affiliates'),
+            url: '/affiliate/dashboard',
+            icon: TrendingUp,
+          },
         ],
       },
       {
@@ -133,6 +139,11 @@ export function useSidebarData(): SidebarData {
             title: t('Users'),
             url: '/users',
             icon: Users,
+          },
+          {
+            title: t('Affiliates'),
+            url: '/affiliate/admin',
+            icon: TrendingUp,
           },
           {
             title: t('Redemption Codes'),

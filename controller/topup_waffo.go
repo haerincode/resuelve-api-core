@@ -385,6 +385,18 @@ func WaffoWebhook(c *gin.Context) {
 			sendWaffoWebhookResponse(c, wh, false, "invalid payment payload")
 			return
 		}
+
+		// Check for replay attacks using merchant order ID as deduplication key
+		merchantOrderID := payload.Result.MerchantOrderID
+		if merchantOrderID != "" {
+			eventID := "waffo:" + merchantOrderID
+			if err := common.CheckAndMarkWebhookProcessed(eventID); err != nil {
+				logger.LogWarn(c.Request.Context(), fmt.Sprintf("Waffo webhook 重放攻击检测 event_type=%s merchant_order_id=%s client_ip=%s error=%q", event.EventType, merchantOrderID, c.ClientIP(), err.Error()))
+				sendWaffoWebhookResponse(c, wh, false, "duplicate event")
+				return
+			}
+		}
+
 		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Waffo webhook 验签并解析成功 event_type=%s merchant_order_id=%s order_status=%s client_ip=%s", event.EventType, payload.Result.MerchantOrderID, payload.Result.OrderStatus, c.ClientIP()))
 		handleWaffoPayment(c, wh, &payload.Result.PaymentNotificationResult)
 	default:
