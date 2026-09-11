@@ -119,6 +119,11 @@ export function useSidebarData(): SidebarData {
             url: '/affiliate/dashboard',
             icon: TrendingUp,
           },
+          {
+            title: t('Support'),
+            url: '/contact',
+            icon: MessageSquare,
+          },
         ],
       },
       {
