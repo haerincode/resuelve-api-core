@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/QuantumNous/new-api/common"
-	"github.com/QuantumNous/new-api/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +17,7 @@ type PromptEncryptionMiddleware struct {
 
 // NewPromptEncryptionMiddleware creates a new prompt encryption middleware
 func NewPromptEncryptionMiddleware() *PromptEncryptionMiddleware {
-	encryptionKey := common.GetEnvOrDefault("PROMPT_ENCRYPTION_KEY", "")
+	encryptionKey := common.GetEnvOrDefaultString("PROMPT_ENCRYPTION_KEY", "")
 	if encryptionKey == "" {
 		return &PromptEncryptionMiddleware{enabled: false}
 	}
