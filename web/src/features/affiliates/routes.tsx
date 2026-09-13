@@ -4,15 +4,15 @@ import { AffiliateAdminPanel } from './components/affiliate-admin-panel';
 import { useAuthStore } from '@/stores/auth-store';
 
 function ProtectedUserRoute({ children }: { children: React.ReactNode }) {
-  const user = useAuthStore((state) => state.auth.user);
-  if (!user) return <Navigate to="/" replace />;
+  const { auth } = useAuthStore();
+  if (!auth.user) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
 function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
-  const user = useAuthStore((state) => state.auth.user);
-  if (!user) return <Navigate to="/dashboard/overview" replace />;
-  if (user.role !== 100) return <Navigate to="/dashboard/overview" replace />;
+  const { auth } = useAuthStore();
+  if (!auth.user) return <Navigate to="/dashboard/overview" replace />;
+  if (auth.user.role !== 100) return <Navigate to="/dashboard/overview" replace />;
   return <>{children}</>;
 }
 
