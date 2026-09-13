@@ -16,6 +16,9 @@ function ProtectedAffiliateRoute({ children }: { children: React.ReactNode }) {
 function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((state) => state.auth.user);
   const isAdmin = user?.role === 100; // RoleRootUser
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
   return isAdmin ? <>{children}</> : <Navigate to="/dashboard/overview" replace />;
 }
 
