@@ -451,3 +451,163 @@ func ExportPendingCommissions(c *gin.Context) {
 	c.Header("Content-Disposition", "attachment; filename=pending_commissions.csv")
 	c.String(http.StatusOK, csv)
 }
+
+func RequestWithdrawal(c *gin.Context) {
+	userID := c.GetInt("id")
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	var user model.User
+	if err := model.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	var affiliate model.Affiliate
+	if err := model.DB.Where("email = ?", user.Email).First(&affiliate).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Affiliate not found"})
+		return
+	}
+
+	var req struct {
+		Amount float64 `json:"amount" binding:"required,gt=0"`
+		Wallet string  `json:"wallet" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := model.RequestWithdrawal(affiliate.ID, req.Amount, req.Wallet); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Withdrawal request submitted"})
+}
+
+func GetWithdrawalHistory(c *gin.Context) {
+	userID := c.GetInt("id")
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	var user model.User
+	if err := model.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	var affiliate model.Affiliate
+	if err := model.DB.Where("email = ?", user.Email).First(&affiliate).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Affiliate not found"})
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "50"))
+	offset := (page - 1) * limit
+
+	var withdrawals []model.AffiliateWithdrawal
+	var total int64
+
+	model.DB.Model(&model.AffiliateWithdrawal{}).
+		Where("affiliate_id = ?", affiliate.ID).
+		Count(&total)
+
+	if err := model.DB.Where("affiliate_id = ?", affiliate.ID).
+		Order("requested_at DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&withdrawals).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch withdrawals"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"withdrawals": withdrawals,
+		"total":       total,
+		"page":        page,
+		"limit":       limit,
+	})
+}
+
+func GetEnhancedDashboard(c *gin.Context) {
+	userID := c.GetInt("id")
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	var user model.User
+	if err := model.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	var affiliate model.Affiliate
+	if err := model.DB.Where("email = ?", user.Email).First(&affiliate).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Affiliate not found"})
+		return
+	}
+
+	// Get referred count
+	var referredCount int64
+	model.DB.Model(&model.User{}).Where("inviter_id = ?", userID).Count(&referredCount)
+
+	// Get commissions stats
+	var totalEarned, totalPending, availableForWithdrawal float64
+	model.DB.Model(&model.AffiliateCommission{}).
+		Where("affiliate_id = ?", affiliate.ID).
+		Select("COALESCE(SUM(amount), 0)").
+		Row().Scan(&totalEarned)
+
+	model.DB.Model(&model.AffiliateCommission{}).
+		Where("affiliate_id = ? AND paid = false", affiliate.ID).
+		Select("COALESCE(SUM(amount), 0)").
+		Row().Scan(&totalPending)
+
+	availableForWithdrawal = totalPending
+
+	// Get tier bonus info
+	tierBonus := 0.0
+	if referredCount >= 100 {
+		tierBonus = 0.50
+	} else if referredCount >= 50 {
+		tierBonus = 0.33
+	} else if referredCount >= 20 {
+		tierBonus = 0.20
+	} else if referredCount >= 10 {
+		tierBonus = 0.10
+	}
+
+	finalCommissionRate := affiliate.CommissionRate * (1 + tierBonus)
+	if finalCommissionRate > 0.5 {
+		finalCommissionRate = 0.5
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"affiliate_code":           affiliate.AffiliateCode,
+		"email":                    affiliate.Email,
+		"usdt_wallet":              affiliate.UsdtWallet,
+		"full_name":                affiliate.FullName,
+		"telegram_handle":          affiliate.TelegramHandle,
+		"referred_count":           referredCount,
+		"total_earned":             totalEarned,
+		"total_paid":               affiliate.TotalPaid,
+		"total_pending":            totalPending,
+		"available_for_withdrawal": availableForWithdrawal,
+		"minimum_withdrawal":       affiliate.MinimumWithdrawal,
+		"commission_rate":          affiliate.CommissionRate,
+		"second_level_rate":        affiliate.SecondLevelRate,
+		"current_tier_bonus":       tierBonus,
+		"final_commission_rate":    finalCommissionRate,
+		"fraud_score":              affiliate.FraudScore,
+		"status":                   affiliate.Status,
+		"created_at":               affiliate.CreatedAt,
+	})
+}

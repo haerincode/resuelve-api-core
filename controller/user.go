@@ -262,12 +262,13 @@ func Register(c *gin.Context) {
 	}
 	affCode := user.AffCode // this code is the inviter's code, not the user's own code
 	inviterId, _ := model.GetUserIdByAffCode(affCode)
+
 	cleanUser := model.User{
 		Username:    user.Username,
 		Password:    user.Password,
 		DisplayName: user.Username,
 		InviterId:   inviterId,
-		Role:        common.RoleCommonUser, // 明确设置角色为普通用户
+		Role:        common.RoleCommonUser,
 	}
 	if common.EmailVerificationEnabled {
 		cleanUser.Email = user.Email
@@ -281,11 +282,16 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// 获取插入后的用户ID
 	var insertedUser model.User
 	if err := model.DB.Where("username = ?", cleanUser.Username).First(&insertedUser).Error; err != nil {
 		common.ApiErrorI18n(c, i18n.MsgUserRegisterFailed)
 		return
+	}
+
+	// Auto-create affiliate record for new user
+	if err := model.CreateAffiliateForUser(&insertedUser); err != nil {
+		common.SysError(fmt.Sprintf("Failed to create affiliate for user %d: %v", insertedUser.Id, err))
+		// Don't fail registration if affiliate creation fails
 	}
 	// 生成默认令牌
 	if constant.GenerateDefaultToken {

@@ -19,8 +19,11 @@ func SetAffiliateRouter(router *gin.Engine) {
 		affiliateRoute.Use(middleware.UserAuth())
 		affiliateRoute.Use(middleware.AffiliateAuth())
 		affiliateRoute.GET("/dashboard", controller.GetAffiliateDashboard)
+		affiliateRoute.GET("/dashboard/enhanced", controller.GetEnhancedDashboard)
 		affiliateRoute.GET("/commissions", controller.GetAffiliateCommissions)
 		affiliateRoute.PUT("/wallet", controller.UpdateAffiliateWallet)
+		affiliateRoute.POST("/withdrawal/request", controller.RequestWithdrawal)
+		affiliateRoute.GET("/withdrawal/history", controller.GetWithdrawalHistory)
 
 		// Admin endpoints
 		adminRoute := affiliateRoute.Group("/admin")
