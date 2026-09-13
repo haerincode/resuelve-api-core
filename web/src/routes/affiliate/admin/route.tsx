@@ -7,8 +7,7 @@ export const Route = createFileRoute('/affiliate/admin')({
   beforeLoad: () => {
     const { auth } = useAuthStore.getState()
 
-    // Check if user is admin
-    if (!auth.user || auth.user.role !== 'admin') {
+    if (!auth.user || auth.user.role !== 100) {
       throw redirect({
         to: '/affiliate/dashboard',
       })

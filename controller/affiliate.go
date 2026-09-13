@@ -237,39 +237,45 @@ func AffiliateLogin(c *gin.Context) {
 }
 
 func GetAffiliateDashboard(c *gin.Context) {
-	affiliateID := c.GetInt("affiliate_id")
-
-	var affiliate model.Affiliate
-	if err := model.DB.First(&affiliate, affiliateID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Affiliate not found"})
+	userID := c.GetInt("id")
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
-	// Find the user_id that matches this affiliate's email
-	var affiliateUserID int
-	if err := model.DB.Model(&model.User{}).
-		Select("id").
-		Where("email = ?", affiliate.Email).
-		Scan(&affiliateUserID).Error; err != nil || affiliateUserID == 0 {
-		// Affiliate email doesn't match any user, so no referrals
-		affiliateUserID = 0
+	var user model.User
+	if err := model.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
 	}
 
-	// Count referred users using the user_id, not affiliate_id
-	var referredCount int64
-	if affiliateUserID > 0 {
-		model.DB.Model(&model.User{}).Where("inviter_id = ?", affiliateUserID).Count(&referredCount)
+	// Get or create affiliate record
+	var affiliate model.Affiliate
+	if err := model.DB.Where("email = ?", user.Email).First(&affiliate).Error; err != nil {
+		// Create new affiliate record if doesn't exist
+		affiliate = model.Affiliate{
+			Email:        user.Email,
+			UsdtWallet:   "",
+			FullName:     user.DisplayName,
+			AffiliateCode: user.AffCode,
+			CreatedAt:    time.Now(),
+		}
+		model.DB.Create(&affiliate)
 	}
+
+	// Count referred users
+	var referredCount int64
+	model.DB.Model(&model.User{}).Where("inviter_id = ?", userID).Count(&referredCount)
 
 	// Sum commissions
 	var totalEarned, totalPending float64
 	model.DB.Model(&model.AffiliateCommission{}).
-		Where("affiliate_id = ?", affiliateID).
+		Where("affiliate_id = ?", affiliate.ID).
 		Select("COALESCE(SUM(amount), 0)").
 		Row().Scan(&totalEarned)
 
 	model.DB.Model(&model.AffiliateCommission{}).
-		Where("affiliate_id = ? AND paid = false", affiliateID).
+		Where("affiliate_id = ? AND paid = false", affiliate.ID).
 		Select("COALESCE(SUM(amount), 0)").
 		Row().Scan(&totalPending)
 
@@ -287,7 +293,29 @@ func GetAffiliateDashboard(c *gin.Context) {
 }
 
 func GetAffiliateCommissions(c *gin.Context) {
-	affiliateID := c.GetInt("affiliate_id")
+	userID := c.GetInt("id")
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	var user model.User
+	if err := model.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	var affiliate model.Affiliate
+	if err := model.DB.Where("email = ?", user.Email).First(&affiliate).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"commissions": []interface{}{},
+			"total":       0,
+			"page":        1,
+			"limit":       50,
+		})
+		return
+	}
+
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "50"))
 	offset := (page - 1) * limit
@@ -296,10 +324,10 @@ func GetAffiliateCommissions(c *gin.Context) {
 	var total int64
 
 	model.DB.Model(&model.AffiliateCommission{}).
-		Where("affiliate_id = ?", affiliateID).
+		Where("affiliate_id = ?", affiliate.ID).
 		Count(&total)
 
-	if err := model.DB.Where("affiliate_id = ?", affiliateID).
+	if err := model.DB.Where("affiliate_id = ?", affiliate.ID).
 		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).
@@ -317,7 +345,24 @@ func GetAffiliateCommissions(c *gin.Context) {
 }
 
 func UpdateAffiliateWallet(c *gin.Context) {
-	affiliateID := c.GetInt("affiliate_id")
+	userID := c.GetInt("id")
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	var user model.User
+	if err := model.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	var affiliate model.Affiliate
+	if err := model.DB.Where("email = ?", user.Email).First(&affiliate).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Affiliate not found"})
+		return
+	}
+
 	var req AffiliateUpdateWalletRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -326,7 +371,7 @@ func UpdateAffiliateWallet(c *gin.Context) {
 	}
 
 	if err := model.DB.Model(&model.Affiliate{}).
-		Where("id = ?", affiliateID).
+		Where("id = ?", affiliate.ID).
 		Update("usdt_wallet", req.UsdtWallet).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update wallet"})
 		return

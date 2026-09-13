@@ -15,7 +15,8 @@ func SetAffiliateRouter(router *gin.Engine) {
 		affiliateRoute.POST("/register", controller.RegisterAffiliate)
 		affiliateRoute.POST("/login", controller.AffiliateLogin)
 
-		// Protected endpoints (require JWT)
+		// Protected endpoints (require user authentication)
+		affiliateRoute.Use(middleware.UserAuth())
 		affiliateRoute.Use(middleware.AffiliateAuth())
 		affiliateRoute.GET("/dashboard", controller.GetAffiliateDashboard)
 		affiliateRoute.GET("/commissions", controller.GetAffiliateCommissions)
