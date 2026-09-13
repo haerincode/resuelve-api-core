@@ -1,9 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
   AffiliateLoginRequest,
   AffiliateRegisterRequest,
-  AffiliateAuthResponse,
-  AffiliateDashboardData
+  AffiliateAuthResponse
 } from '../types';
 
 const AFFILIATE_TOKEN_KEY = 'affiliate_token';
@@ -59,23 +58,4 @@ export function useAffiliateAuth() {
     getToken,
     isAuthenticated
   };
-}
-
-export function useAffiliateDashboard() {
-  const { getToken } = useAffiliateAuth();
-
-  return useQuery({
-    queryKey: ['affiliate-dashboard'],
-    queryFn: async (): Promise<AffiliateDashboardData> => {
-      const token = getToken();
-      if (!token) throw new Error('Not authenticated');
-
-      const response = await fetch('/api/affiliate/dashboard', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error('Failed to fetch dashboard');
-      return response.json();
-    },
-    enabled: !!getToken()
-  });
 }
