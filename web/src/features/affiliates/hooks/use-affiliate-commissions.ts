@@ -8,7 +8,12 @@ export function useAffiliateDashboard() {
       const response = await fetch('/api/affiliate/dashboard', {
         credentials: 'include'
       });
-      if (!response.ok) throw new Error('Failed to fetch dashboard');
+      if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = '/';
+        }
+        throw new Error('Failed to fetch dashboard');
+      }
       return response.json();
     }
   });
