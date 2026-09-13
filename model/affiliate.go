@@ -345,17 +345,15 @@ func DetectFraud(affiliateID int, newUserID int, ipAddress string, deviceID stri
 	}
 
 	// Check 4: New user has same payment method/IP as inviter (self-referral)
-	inviter, _ := GetUserById(affiliateID, false)
-	newUser, _ := GetUserById(newUserID, false)
-	if inviter != nil && newUser != nil && inviter.LastIp == ipAddress {
-		fraudScore += 40
-		fraudReasons = append(fraudReasons, "self_referral_same_ip")
-	}
+	// Note: IP validation removed - need to add IP tracking to User model for this
 
 	// Check 5: User has very few activities (likely fake)
-	if newUser != nil && newUser.UsedQuota == 0 && time.Since(newUser.CreatedAt) > 24*time.Hour {
-		fraudScore += 15
-		fraudReasons = append(fraudReasons, "no_usage_24h")
+	if newUser != nil && newUser.UsedQuota == 0 {
+		createdTime := time.UnixMilli(newUser.CreatedAt)
+		if time.Since(createdTime) > 24*time.Hour {
+			fraudScore += 15
+			fraudReasons = append(fraudReasons, "no_usage_24h")
+		}
 	}
 
 	// Check 6: Rapid recharges from referred accounts
