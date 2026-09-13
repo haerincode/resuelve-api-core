@@ -302,7 +302,7 @@ func UpdateAffiliateReferredCount(userID int) error {
 
 // DetectFraud checks for fraud patterns and updates fraud score
 func DetectFraud(affiliateID int, newUserID int, ipAddress string, deviceID string) error {
-	affiliate, err := GetAffiliateByEmail("")
+	affiliate, err := GetAffiliateByUser(affiliateID)
 	if err != nil {
 		return nil
 	}
@@ -313,25 +313,14 @@ func DetectFraud(affiliateID int, newUserID int, ipAddress string, deviceID stri
 	// Check 1: Multiple accounts from same affiliate in short time
 	var recentCount int64
 	DB.Model(&User{}).
-		Where("inviter_id = ? AND created_at > ?", affiliateID, time.Now().Add(-24*time.Hour)).
+		Where("inviter_id = ? AND created_at > ?", affiliateID, time.Now().UnixMilli()-24*3600*1000).
 		Count(&recentCount)
 	if recentCount > 5 {
 		fraudScore += 25
 		fraudReasons = append(fraudReasons, "rapid_signups")
 	}
 
-	// Check 2: Same IP address for multiple accounts
-	var sameIPCount int64
-	DB.Model(&User{}).
-		Where("inviter_id = ? AND last_ip = ?", affiliateID, ipAddress).
-		Where("id != ?", newUserID).
-		Count(&sameIPCount)
-	if sameIPCount > 2 {
-		fraudScore += 30
-		fraudReasons = append(fraudReasons, "same_ip_multiple_accounts")
-	}
-
-	// Check 3: Same device for multiple accounts
+	// Check 2: Same device for multiple accounts
 	if deviceID != "" {
 		var sameDeviceCount int64
 		DB.Model(&User{}).
@@ -344,10 +333,8 @@ func DetectFraud(affiliateID int, newUserID int, ipAddress string, deviceID stri
 		}
 	}
 
-	// Check 4: New user has same payment method/IP as inviter (self-referral)
-	// Note: IP validation removed - need to add IP tracking to User model for this
-
-	// Check 5: User has very few activities (likely fake)
+	// Check 3: New user has very few activities (likely fake)
+	newUser, _ := GetUserById(newUserID, false)
 	if newUser != nil && newUser.UsedQuota == 0 {
 		createdTime := time.UnixMilli(newUser.CreatedAt)
 		if time.Since(createdTime) > 24*time.Hour {
@@ -356,10 +343,10 @@ func DetectFraud(affiliateID int, newUserID int, ipAddress string, deviceID stri
 		}
 	}
 
-	// Check 6: Rapid recharges from referred accounts
+	// Check 4: Rapid recharges from referred accounts
 	var rapidRechargeCount int64
 	DB.Model(&User{}).
-		Where("inviter_id = ? AND last_login_time > ?", affiliateID, time.Now().Add(-1*time.Hour)).
+		Where("inviter_id = ? AND last_login_at > ?", affiliateID, time.Now().UnixMilli()-3600*1000).
 		Count(&rapidRechargeCount)
 	if rapidRechargeCount > 3 {
 		fraudScore += 20
@@ -396,6 +383,15 @@ func DetectFraud(affiliateID int, newUserID int, ipAddress string, deviceID stri
 	}
 
 	return nil
+}
+
+// GetAffiliateByUser gets affiliate by user ID
+func GetAffiliateByUser(userID int) (*Affiliate, error) {
+	user, err := GetUserById(userID, false)
+	if err != nil {
+		return nil, err
+	}
+	return GetAffiliateByEmail(user.Email)
 }
 
 // GetAvailableCommissions calculates available commissions for withdrawal
