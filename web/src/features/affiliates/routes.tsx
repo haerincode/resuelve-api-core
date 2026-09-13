@@ -1,13 +1,12 @@
 import { Navigate } from 'react-router-dom';
-import { AffiliateAuthPage } from './components/affiliate-auth-page';
 import { AffiliateDashboard } from './components/affiliate-dashboard';
 import { AffiliateAdminPanel } from './components/affiliate-admin-panel';
-import { useAffiliateAuth } from './hooks/use-affiliate-auth';
 import { useAuthStore } from '@/stores/auth-store';
 
-function ProtectedAffiliateRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAffiliateAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/affiliate/auth" replace />;
+function ProtectedUserRoute({ children }: { children: React.ReactNode }) {
+  const user = useAuthStore((state) => state.auth.user);
+  if (!user) return <Navigate to="/" replace />;
+  return <>{children}</>;
 }
 
 function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
@@ -19,15 +18,11 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
 
 export const affiliateRoutes = [
   {
-    path: '/affiliate/auth',
-    element: <AffiliateAuthPage />
-  },
-  {
     path: '/affiliate/dashboard',
     element: (
-      <ProtectedAffiliateRoute>
+      <ProtectedUserRoute>
         <AffiliateDashboard />
-      </ProtectedAffiliateRoute>
+      </ProtectedUserRoute>
     )
   },
   {
