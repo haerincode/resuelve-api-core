@@ -39,6 +39,7 @@ import { useTranslation } from 'react-i18next'
 
 import { type SidebarData } from '@/components/layout/types'
 import { ROLE } from '@/lib/roles'
+import { useAuthStore } from '@/stores/auth-store'
 
 /**
  * Root navigation groups for the application sidebar.
@@ -48,6 +49,8 @@ import { ROLE } from '@/lib/roles'
  */
 export function useSidebarData(): SidebarData {
   const { t } = useTranslation()
+  const user = useAuthStore((state) => state.auth.user)
+  const isAdmin = user?.role === 100 // RoleRootUser
 
   return {
     navGroups: [
@@ -116,7 +119,7 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: t('Affiliates'),
-            url: '/affiliate/dashboard',
+            url: isAdmin ? '/affiliate/admin' : '/affiliate/dashboard',
             icon: TrendingUp,
           },
           {
