@@ -4,22 +4,17 @@ import { AffiliateDashboard } from './components/affiliate-dashboard';
 import { AffiliateAdminPanel } from './components/affiliate-admin-panel';
 import { useAffiliateAuth } from './hooks/use-affiliate-auth';
 import { useAuthStore } from '@/stores/auth-store';
-import { common } from '@/lib/roles';
 
-// Protected route wrapper for authenticated affiliates
 function ProtectedAffiliateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAffiliateAuth();
   return isAuthenticated ? <>{children}</> : <Navigate to="/affiliate/auth" replace />;
 }
 
-// Protected route wrapper for admin users
 function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((state) => state.auth.user);
-  const isAdmin = user?.role === 100; // RoleRootUser
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-  return isAdmin ? <>{children}</> : <Navigate to="/dashboard/overview" replace />;
+  if (!user) return <Navigate to="/dashboard/overview" replace />;
+  if (user.role !== 100) return <Navigate to="/dashboard/overview" replace />;
+  return <>{children}</>;
 }
 
 export const affiliateRoutes = [
