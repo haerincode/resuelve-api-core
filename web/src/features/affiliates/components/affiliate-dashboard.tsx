@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useAffiliateDashboard } from '../hooks/use-affiliate-auth';
-import { useAffiliateCommissions } from '../hooks/use-affiliate-commissions';
+import { useAffiliateDashboard, useAffiliateCommissions } from '../hooks/use-affiliate-commissions';
 import { Copy, DollarSign, Users, TrendingUp, ExternalLink } from 'lucide-react';
 
 export function AffiliateDashboard() {
