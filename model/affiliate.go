@@ -296,7 +296,7 @@ func UpdateAffiliateReferredCount(userID int) error {
 }
 
 // DetectFraud checks for fraud patterns and updates fraud score
-func DetectFraud(affiliateID int, newUserID int) error {
+func DetectFraud(affiliateID int, newUserID int, ipAddress string, deviceID string) error {
 	affiliate, err := GetAffiliateByEmail("")
 	if err != nil {
 		return nil
@@ -305,21 +305,62 @@ func DetectFraud(affiliateID int, newUserID int) error {
 	fraudScore := 0
 	var fraudReasons []string
 
-	// Check: Multiple accounts from same affiliate in short time
+	// Check 1: Multiple accounts from same affiliate in short time
 	var recentCount int64
 	DB.Model(&User{}).
 		Where("inviter_id = ? AND created_at > ?", affiliateID, time.Now().Add(-24*time.Hour)).
 		Count(&recentCount)
 	if recentCount > 5 {
-		fraudScore += 20
+		fraudScore += 25
 		fraudReasons = append(fraudReasons, "rapid_signups")
 	}
 
-	// Check: User has very few activities (likely fake)
+	// Check 2: Same IP address for multiple accounts
+	var sameIPCount int64
+	DB.Model(&User{}).
+		Where("inviter_id = ? AND last_ip = ?", affiliateID, ipAddress).
+		Where("id != ?", newUserID).
+		Count(&sameIPCount)
+	if sameIPCount > 2 {
+		fraudScore += 30
+		fraudReasons = append(fraudReasons, "same_ip_multiple_accounts")
+	}
+
+	// Check 3: Same device for multiple accounts
+	if deviceID != "" {
+		var sameDeviceCount int64
+		DB.Model(&User{}).
+			Where("inviter_id = ?", affiliateID).
+			Where("id != ?", newUserID).
+			Count(&sameDeviceCount)
+		if sameDeviceCount > 2 {
+			fraudScore += 30
+			fraudReasons = append(fraudReasons, "same_device_multiple_accounts")
+		}
+	}
+
+	// Check 4: New user has same payment method/IP as inviter (self-referral)
+	inviter, _ := GetUserById(affiliateID, false)
 	newUser, _ := GetUserById(newUserID, false)
-	if newUser != nil && newUser.QuotaUsed == 0 {
-		fraudScore += 10
-		fraudReasons = append(fraudReasons, "no_usage")
+	if inviter != nil && newUser != nil && inviter.LastIp == ipAddress {
+		fraudScore += 40
+		fraudReasons = append(fraudReasons, "self_referral_same_ip")
+	}
+
+	// Check 5: User has very few activities (likely fake)
+	if newUser != nil && newUser.QuotaUsed == 0 && time.Since(newUser.CreatedAt) > 24*time.Hour {
+		fraudScore += 15
+		fraudReasons = append(fraudReasons, "no_usage_24h")
+	}
+
+	// Check 6: Rapid recharges from referred accounts
+	var rapidRechargeCount int64
+	DB.Model(&User{}).
+		Where("inviter_id = ? AND last_login_time > ?", affiliateID, time.Now().Add(-1*time.Hour)).
+		Count(&rapidRechargeCount)
+	if rapidRechargeCount > 3 {
+		fraudScore += 20
+		fraudReasons = append(fraudReasons, "rapid_recharges")
 	}
 
 	if fraudScore > 0 {
@@ -341,6 +382,10 @@ func DetectFraud(affiliateID int, newUserID int) error {
 					"fraud_locked":  true,
 					"status":        "suspended",
 				})
+			common.SysLog(fmt.Sprintf("Affiliate %d suspended due to fraud (score: %d)", affiliateID, newScore))
+		} else if newScore >= 60 {
+			DB.Model(&Affiliate{}).Where("id = ?", affiliateID).
+				Update("status", "under_review")
 		} else {
 			DB.Model(&Affiliate{}).Where("id = ?", affiliateID).
 				Update("fraud_score", newScore)
