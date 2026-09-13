@@ -43,10 +43,10 @@ function ContactPage() {
             {t('Send us an email and we\'ll respond within 24 hours.')}
           </p>
           <a
-            href="mailto:support@resuelve-api.lat"
+            href="mailto:soporte@resuelve-api.lat"
             className="text-blue-600 dark:text-blue-400 font-medium hover:underline"
           >
-            support@resuelve-api.lat
+            soporte@resuelve-api.lat
           </a>
         </div>
       </div>
