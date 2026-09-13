@@ -31,7 +31,4 @@ func SetAffiliateRouter(router *gin.Engine) {
 			adminRoute.GET("/export/pending", controller.ExportPendingCommissions)
 		}
 	}
-
-	// Webhook endpoint (protected by secret)
-	router.POST("/webhook/topup", middleware.WebhookAuth(), controller.HandleTopupWebhook)
 }
