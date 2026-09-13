@@ -1,6 +1,7 @@
 package model
 
 import (
+	"crypto/rand"
 	"fmt"
 	"github.com/QuantumNous/new-api/common"
 	"gorm.io/gorm"
@@ -127,8 +128,12 @@ func generateAffiliateCodeForUser(userID int) string {
 func generateShortCode() string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, 6)
+	randBytes := make([]byte, 6)
+	if _, err := rand.Read(randBytes); err != nil {
+		return "RANDOM"
+	}
 	for i := range b {
-		b[i] = charset[common.RandInt(0, len(charset))]
+		b[i] = charset[randBytes[i]%byte(len(charset))]
 	}
 	return string(b)
 }
@@ -348,7 +353,7 @@ func DetectFraud(affiliateID int, newUserID int, ipAddress string, deviceID stri
 	}
 
 	// Check 5: User has very few activities (likely fake)
-	if newUser != nil && newUser.QuotaUsed == 0 && time.Since(newUser.CreatedAt) > 24*time.Hour {
+	if newUser != nil && newUser.UsedQuota == 0 && time.Since(newUser.CreatedAt) > 24*time.Hour {
 		fraudScore += 15
 		fraudReasons = append(fraudReasons, "no_usage_24h")
 	}
@@ -402,7 +407,7 @@ func GetAvailableCommissions(affiliateID int) (float64, error) {
 		Where("affiliate_id = ? AND paid = false", affiliateID).
 		Select("COALESCE(SUM(amount), 0)").
 		Row().Scan(&total)
-	return total, err.Error
+	return total, err
 }
 
 // RequestWithdrawal creates a withdrawal request

@@ -225,18 +225,6 @@ function StatCard({ icon, label, value, subtext, highlight }: any) {
     </div>
   );
 }
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Users className="h-8 w-8 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Referred Users
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {dashboard.referred_count}
-              </p>
             </div>
           </div>
         </div>
