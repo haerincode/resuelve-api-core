@@ -5,7 +5,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/model"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -74,72 +73,30 @@ func AffiliateAuth() gin.HandlerFunc {
 		c.Next()
 	}
 }
-			return []byte(secret), nil
-		})
-
-		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-			c.Abort()
-			return
-		}
-
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
-			c.Abort()
-			return
-		}
-
-		affiliateID, ok := claims["affiliate_id"].(float64)
-		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid affiliate ID"})
-			c.Abort()
-			return
-		}
-
-		c.Set("affiliate_id", int(affiliateID))
-		c.Next()
-	}
-}
 
 func AffiliateAdminAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Check if user is admin via existing New-API auth
-		userId := c.GetInt("id")
-		if userId == 0 {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		userID := c.GetInt("id")
+		if userID == 0 {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Not authenticated"})
 			c.Abort()
 			return
 		}
 
-		user, err := model.GetUserById(userId, false)
-		if err != nil || user.Role != common.RoleRootUser {
+		user, err := model.GetUserById(userID, false)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+			c.Abort()
+			return
+		}
+
+		if user.Role != 100 {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Admin access required"})
 			c.Abort()
 			return
 		}
 
-		c.Next()
-	}
-}
-
-func WebhookAuth() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		secret := c.GetHeader("X-Webhook-Secret")
-		expectedSecret := os.Getenv("WEBHOOK_SECRET")
-
-		if expectedSecret == "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "WEBHOOK_SECRET not configured"})
-			c.Abort()
-			return
-		}
-
-		if secret != expectedSecret {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid webhook secret"})
-			c.Abort()
-			return
-		}
-
+		c.Set("id", userID)
 		c.Next()
 	}
 }
