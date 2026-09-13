@@ -66,10 +66,10 @@ export function PricingComparison() {
             {t('pricing.why.title')}
           </div>
           <h2 className='text-3xl font-bold tracking-tight md:text-4xl'>
-            Hasta 77% más barato que los precios oficiales
+            {t('pricing.comparison.title')}
           </h2>
           <p className='text-muted-foreground mx-auto mt-3 max-w-2xl'>
-            Mismos modelos, misma calidad, sin sobreprecio corporativo
+            {t('pricing.comparison.subtitle')}
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export function PricingComparison() {
 
               <div className='space-y-2'>
                 <div className='flex items-baseline justify-between'>
-                  <span className='text-muted-foreground text-sm'>Oficial</span>
+                  <span className='text-muted-foreground text-sm'>{t('pricing.comparison.official')}</span>
                   <span className='text-muted-foreground text-lg line-through'>
                     {item.official}
                   </span>
@@ -100,14 +100,14 @@ export function PricingComparison() {
                 </div>
                 {item.cache && (
                   <div className='border-border/50 flex items-baseline justify-between border-t pt-2'>
-                    <span className='text-muted-foreground text-xs'>Con caché</span>
+                    <span className='text-muted-foreground text-xs'>{t('pricing.comparison.with_cache')}</span>
                     <span className='text-primary text-sm font-semibold'>{item.cache}</span>
                   </div>
                 )}
               </div>
 
               <p className='text-muted-foreground mt-3 text-xs'>
-                Precio por millón de tokens (USD / 1M)
+                {t('pricing.comparison.price_per_million')}
               </p>
             </div>
           ))}
@@ -115,33 +115,33 @@ export function PricingComparison() {
 
         {/* Why cheaper */}
         <div className='bg-card rounded-xl border p-6 md:p-8'>
-          <h3 className='mb-6 text-xl font-semibold'>¿Por qué es más barato?</h3>
+          <h3 className='mb-6 text-xl font-semibold'>{t('pricing.why.question')}</h3>
           <div className='grid gap-4 md:grid-cols-3'>
             <div>
               <div className='mb-2 flex size-10 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400'>
                 <span className='text-xl font-bold'>1</span>
               </div>
-              <h4 className='mb-1 font-semibold'>Acceso Mayorista</h4>
+              <h4 className='mb-1 font-semibold'>{t('pricing.why.wholesale.title')}</h4>
               <p className='text-muted-foreground text-sm'>
-                Agrupamos demanda y nos conectamos a infraestructura enterprise por volumen
+                {t('pricing.why.wholesale.desc')}
               </p>
             </div>
             <div>
               <div className='mb-2 flex size-10 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400'>
                 <span className='text-xl font-bold'>2</span>
               </div>
-              <h4 className='mb-1 font-semibold'>Prompt Caching Real</h4>
+              <h4 className='mb-1 font-semibold'>{t('pricing.why.caching.title')}</h4>
               <p className='text-muted-foreground text-sm'>
-                En editores como Cursor, el código se lee desde caché, reduciendo el costo hasta 90%
+                {t('pricing.why.caching.desc')}
               </p>
             </div>
             <div>
               <div className='mb-2 flex size-10 items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400'>
                 <span className='text-xl font-bold'>3</span>
               </div>
-              <h4 className='mb-1 font-semibold'>Pay-As-You-Go</h4>
+              <h4 className='mb-1 font-semibold'>{t('pricing.why.payg.title')}</h4>
               <p className='text-muted-foreground text-sm'>
-                Cero mensualidades fijas de $20. Cargas cuando necesitas y el saldo no vence
+                {t('pricing.why.payg.desc')}
               </p>
             </div>
           </div>

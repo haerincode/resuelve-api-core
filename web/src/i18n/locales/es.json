@@ -5366,6 +5366,27 @@
     "support.title": "Soporte de Dev a Dev",
     "support.contact": "contacto@resuelve-api.lat",
     "footer.legal.title": "Aviso Legal y Descargo de Responsabilidad",
-    "footer.legal.disclaimer": "Resuelve-API es una pasarela técnica independiente. No es propietaria ni mantiene afiliación oficial con OpenAI, Anthropic, Google, xAI. Las marcas se usan solo para identificar compatibilidad técnica. Transacciones bajo Pay-As-You-Go, saldo consumido no reembolsable. Procesamiento transitorio conforme a Ley 19.628 de Chile."
+    "footer.legal.disclaimer": "Resuelve-API es una pasarela técnica independiente. No es propietaria ni mantiene afiliación oficial con OpenAI, Anthropic, Google, xAI. Las marcas se usan solo para identificar compatibilidad técnica. Transacciones bajo Pay-As-You-Go, saldo consumido no reembolsable. Procesamiento transitorio conforme a Ley 19.628 de Chile.",
+    "hero.infrastructure_badge": "Infraestructura de IA para LatAm",
+    "hero.ide_compatibility": "Compatible con Cursor, Cline, VS Code y más IDEs. Configuración en 1 minuto.",
+    "payment.methods.title": "Métodos de Pago",
+    "payment.methods.subtitle": "Paga como prefieras",
+    "payment.methods.description": "Soportamos pagos locales en Chile y pagos internacionales con USDT",
+    "payment.methods.chile_methods": "Cuenta RUT, Débito, Transferencia",
+    "payment.methods.usdt_methods": "USDT TRC20, BSC, Binance Pay",
+    "payment.methods.balance_never_expires": "Saldo nunca vence",
+    "payment.methods.no_hidden_fees": "Sin comisiones ocultas",
+    "pricing.comparison.title": "Hasta 77% más barato que los precios oficiales",
+    "pricing.comparison.subtitle": "Mismos modelos, misma calidad, sin sobreprecio corporativo",
+    "pricing.comparison.official": "Oficial",
+    "pricing.comparison.with_cache": "Con caché",
+    "pricing.comparison.price_per_million": "Precio por millón de tokens (USD / 1M)",
+    "pricing.why.question": "¿Por qué es más barato?",
+    "pricing.why.wholesale.title": "Acceso Mayorista",
+    "pricing.why.wholesale.desc": "Agrupamos demanda y nos conectamos a infraestructura enterprise por volumen",
+    "pricing.why.caching.title": "Prompt Caching Real",
+    "pricing.why.caching.desc": "En editores como Cursor, el código se lee desde caché, reduciendo el costo hasta 90%",
+    "pricing.why.payg.title": "Pay-As-You-Go",
+    "pricing.why.payg.desc": "Cero mensualidades fijas de $20. Cargas cuando necesitas y el saldo no vence"
   }
 }

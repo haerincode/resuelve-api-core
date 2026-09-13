@@ -5354,6 +5354,27 @@
     "support.title": "Dev-to-Dev Support",
     "support.contact": "contacto@resuelve-api.lat",
     "footer.legal.title": "Legal Notice and Disclaimer",
-    "footer.legal.disclaimer": "Resuelve-API is an independent technical gateway. Not owned by nor officially affiliated with OpenAI, Anthropic, Google, xAI. Trademarks used solely to identify technical compatibility. Pay-As-You-Go transactions, consumed balance non-refundable. Transient processing per Chilean Law 19.628."
+    "footer.legal.disclaimer": "Resuelve-API is an independent technical gateway. Not owned by nor officially affiliated with OpenAI, Anthropic, Google, xAI. Trademarks used solely to identify technical compatibility. Pay-As-You-Go transactions, consumed balance non-refundable. Transient processing per Chilean Law 19.628.",
+    "hero.infrastructure_badge": "AI Infrastructure for LatAm",
+    "hero.ide_compatibility": "Compatible with Cursor, Cline, VS Code and more IDEs. Setup in 1 minute.",
+    "payment.methods.title": "Payment Methods",
+    "payment.methods.subtitle": "Pay how you prefer",
+    "payment.methods.description": "We support local payments in Chile and international payments with USDT",
+    "payment.methods.chile_methods": "Cuenta RUT, Debit, Transfer",
+    "payment.methods.usdt_methods": "USDT TRC20, BSC, Binance Pay",
+    "payment.methods.balance_never_expires": "Balance never expires",
+    "payment.methods.no_hidden_fees": "No hidden fees",
+    "pricing.comparison.title": "Up to 77% cheaper than official prices",
+    "pricing.comparison.subtitle": "Same models, same quality, no corporate markup",
+    "pricing.comparison.official": "Official",
+    "pricing.comparison.with_cache": "With cache",
+    "pricing.comparison.price_per_million": "Price per million tokens (USD / 1M)",
+    "pricing.why.question": "Why is it cheaper?",
+    "pricing.why.wholesale.title": "Wholesale Access",
+    "pricing.why.wholesale.desc": "We group demand and connect to enterprise infrastructure by volume",
+    "pricing.why.caching.title": "Real Prompt Caching",
+    "pricing.why.caching.desc": "In editors like Cursor, code is read from cache, reducing cost up to 90%",
+    "pricing.why.payg.title": "Pay-As-You-Go",
+    "pricing.why.payg.desc": "Zero fixed $20 monthly fees. Load when you need it and balance never expires"
   }
 }

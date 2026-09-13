@@ -1,12 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { AffiliateDashboard } from '@/features/affiliates'
-import { useAffiliateAuth } from '@/features/affiliates'
 
 export const Route = createFileRoute('/affiliate/dashboard')({
-  beforeLoad: () => {
-    const { isAuthenticated } = useAffiliateAuth()
-    if (!isAuthenticated) {
-      throw new Error('Not authenticated as affiliate')
+  beforeLoad: ({ context }) => {
+    const user = context.auth?.user
+    if (!user || (user.role !== 0 && user.role !== 10)) {
+      throw redirect({ to: '/affiliate' })
     }
   },
   component: AffiliateDashboard,

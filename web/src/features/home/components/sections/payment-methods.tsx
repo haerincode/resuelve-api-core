@@ -53,13 +53,13 @@ export function PaymentMethods() {
         <div className='mb-12 text-center'>
           <div className='mb-3 inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400'>
             <CreditCard className='size-3.5' />
-            Métodos de Pago
+            {t('payment.methods.title')}
           </div>
           <h2 className='text-3xl font-bold tracking-tight md:text-4xl'>
-            Paga como prefieras
+            {t('payment.methods.subtitle')}
           </h2>
           <p className='text-muted-foreground mx-auto mt-3 max-w-2xl'>
-            Soportamos pagos locales en Chile y pagos internacionales con USDT
+            {t('payment.methods.description')}
           </p>
         </div>
 
@@ -99,10 +99,10 @@ export function PaymentMethods() {
         {/* Additional Info */}
         <div className='bg-muted/50 mt-8 rounded-xl border p-6 text-center'>
           <p className='text-muted-foreground text-sm'>
-            💳 <strong>Cuenta RUT, Débito, Transferencia</strong> vía Flow (Chile) •
-            🪙 <strong>USDT TRC20, BSC, Binance Pay</strong> (Internacional) •
-            💵 <strong>Saldo nunca vence</strong> •
-            ⚡ <strong>Sin comisiones ocultas</strong>
+            💳 <strong>{t('payment.methods.chile_methods')}</strong> vía Flow (Chile) •
+            🪙 <strong>{t('payment.methods.usdt_methods')}</strong> (Internacional) •
+            💵 <strong>{t('payment.methods.balance_never_expires')}</strong> •
+            ⚡ <strong>{t('payment.methods.no_hidden_fees')}</strong>
           </p>
         </div>
       </div>

@@ -111,7 +111,7 @@ export function Hero(props: HeroProps) {
               <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75' />
               <span className='relative inline-flex size-1.5 rounded-full bg-blue-500 dark:bg-blue-400' />
             </span>
-            <span>{t('payment.chile.title')} Infraestructura de IA para LatAm</span>
+            <span>{t('payment.chile.title')} {t('hero.infrastructure_badge')}</span>
           </div>
 
           <h1
@@ -173,9 +173,7 @@ export function Hero(props: HeroProps) {
                 {t('Supported Applications')}
               </span>
               <p className='text-muted-foreground/60 text-xs leading-relaxed'>
-                {t(
-                  'Compatible con Cursor, Cline, VS Code y más IDEs. Configuración en 1 minuto.'
-                )}
+                {t('hero.ide_compatibility')}
               </p>
             </div>
             <div className='flex flex-wrap items-center gap-3'>
