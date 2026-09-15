@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google" content="notranslate" />
 
+    <!-- Performance: DNS prefetch + preconnect for external resources -->
+    <link rel="preconnect" href="https://i.imgur.com" crossorigin />
+    <link rel="dns-prefetch" href="https://i.imgur.com" />
+
     <!-- Primary Meta Tags -->
     <title>Resuelve-API — Gateway de Modelos de IA para Chile y LatAm</title>
     <meta name="title" content="Resuelve-API — Gateway de Modelos de IA para Chile y LatAm" />
@@ -15,6 +19,13 @@
     />
 
     <meta name="theme-color" content="#fff" />
+
+    <!-- Critical CSS inline to prevent render blocking -->
+    <style>
+      #root{min-height:100vh}
+      body{margin:0;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+    </style>
+
     <!--umami-->
     <!--Google Analytics-->
   </head>
