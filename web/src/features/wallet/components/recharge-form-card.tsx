@@ -539,7 +539,7 @@ export function RechargeFormCard({
             <p className='text-muted-foreground text-xs'>
               {t('Need a redemption code?')}{' '}
               <a
-                href={topupLink}
+                href={`${topupLink}?money=${topupAmount || 0}`}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='inline-flex items-center gap-1 underline-offset-4 hover:underline'
