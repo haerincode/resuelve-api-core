@@ -69,6 +69,8 @@ export function SystemBrand(props: SystemBrandProps) {
           <img
             src={logo}
             alt={t('Logo')}
+            loading="eager"
+            decoding="async"
             className='size-full rounded-md object-cover'
           />
         </div>
@@ -89,6 +91,8 @@ export function SystemBrand(props: SystemBrandProps) {
             <img
               src={logo}
               alt={t('Logo')}
+              loading="eager"
+              decoding="async"
               className='size-full rounded-lg object-cover'
             />
           </div>

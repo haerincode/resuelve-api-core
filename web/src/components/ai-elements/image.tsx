@@ -34,6 +34,8 @@ export const Image = ({
   <img
     {...props}
     alt={props.alt}
+    loading="lazy"
+    decoding="async"
     className={cn(
       'h-auto max-w-full overflow-hidden rounded-md',
       props.className
