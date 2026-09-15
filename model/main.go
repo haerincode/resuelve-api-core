@@ -352,6 +352,7 @@ func migrateDB() error {
 		&AuthzRole{},
 		&Affiliate{},
 		&AffiliateCommission{},
+		&PaymentFlow{},
 	)
 	if err != nil {
 		return err
