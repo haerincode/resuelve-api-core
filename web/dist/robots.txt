@@ -1,0 +1,36 @@
+# Resuelve-API - robots.txt
+# https://resuelve-api.lat/robots.txt
+
+User-agent: *
+Allow: /
+Allow: /pricing
+Allow: /docs
+Allow: /about
+Allow: /rankings
+Allow: /blog
+
+# Disallow admin and auth pages
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api
+Disallow: /login
+Disallow: /signup
+Disallow: /setup
+
+# Disallow duplicate content
+Disallow: /*?*sort=
+Disallow: /*?*page=
+Disallow: /*?*filter=
+
+# Allow Google bots to crawl everything
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+# Sitemap
+Sitemap: https://resuelve-api.lat/sitemap.xml
+
+# Crawl-delay (be nice to servers)
+Crawl-delay: 1

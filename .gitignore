@@ -43,3 +43,6 @@ go.work.sum
 .env.backup
 .env.local
 .env
+
+# Allow web/dist for Heroku deployment
+!web/dist
