@@ -1,8 +1,5 @@
 build:
-  languages:
-    - node
-    - go
-  packages:
-    - bun
+  docker:
+    web: Dockerfile
 run:
   web: ./bin/new-api

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as authRouteRouteImport } from './routes/(auth)/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as ClaudeBaratoChileRouteImport } from './routes/claude-barato-chile'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CursorApiEconomicaRouteImport } from './routes/cursor-api-economica'
 import { Route as PricingSeoRouteImport } from './routes/pricing-seo'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
@@ -33,6 +34,8 @@ import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as AuthenticatedChat2linkRouteImport } from './routes/_authenticated/chat2link'
 import { Route as AuthenticatedSystemSettingsRouteRouteImport } from './routes/_authenticated/system-settings/route'
 import { Route as AboutIndexRouteImport } from './routes/about/index'
+import { Route as AffiliateAdminRouteRouteImport } from './routes/affiliate/admin/route'
+import { Route as AffiliateDashboardRouteRouteImport } from './routes/affiliate/dashboard/route'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogClaudeOpus5VsSonnet5CualElegirRouteImport } from './routes/blog/claude-opus-5-vs-sonnet-5-cual-elegir'
 import { Route as BlogComoAhorre500DolaresAlMesEnApisDeIaRouteImport } from './routes/blog/como-ahorre-500-dolares-al-mes-en-apis-de-ia'
@@ -95,6 +98,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const ClaudeBaratoChileRoute = ClaudeBaratoChileRouteImport.update({
   id: '/claude-barato-chile',
   path: '/claude-barato-chile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CursorApiEconomicaRoute = CursorApiEconomicaRouteImport.update({
@@ -196,6 +204,16 @@ const AuthenticatedSystemSettingsRouteRoute =
 const AboutIndexRoute = AboutIndexRouteImport.update({
   id: '/about/',
   path: '/about/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AffiliateAdminRouteRoute = AffiliateAdminRouteRouteImport.update({
+  id: '/affiliate/admin',
+  path: '/affiliate/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AffiliateDashboardRouteRoute = AffiliateDashboardRouteRouteImport.update({
+  id: '/affiliate/dashboard',
+  path: '/affiliate/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -460,12 +478,15 @@ const AuthenticatedSystemSettingsSiteSectionRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/claude-barato-chile': typeof ClaudeBaratoChileRoute
+  '/contact': typeof ContactRoute
   '/cursor-api-economica': typeof CursorApiEconomicaRoute
   '/pricing-seo': typeof PricingSeoRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap': typeof SitemapRoute
   '/user-agreement': typeof UserAgreementRoute
   '/system-settings': typeof AuthenticatedSystemSettingsRouteRouteWithChildren
+  '/affiliate/admin': typeof AffiliateAdminRouteRoute
+  '/affiliate/dashboard': typeof AffiliateDashboardRouteRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/oauth': typeof authOauthRoute
   '/otp': typeof authOtpRoute
@@ -529,11 +550,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/claude-barato-chile': typeof ClaudeBaratoChileRoute
+  '/contact': typeof ContactRoute
   '/cursor-api-economica': typeof CursorApiEconomicaRoute
   '/pricing-seo': typeof PricingSeoRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap': typeof SitemapRoute
   '/user-agreement': typeof UserAgreementRoute
+  '/affiliate/admin': typeof AffiliateAdminRouteRoute
+  '/affiliate/dashboard': typeof AffiliateDashboardRouteRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/oauth': typeof authOauthRoute
   '/otp': typeof authOtpRoute
@@ -600,12 +624,15 @@ export interface FileRoutesById {
   '/(auth)': typeof authRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/claude-barato-chile': typeof ClaudeBaratoChileRoute
+  '/contact': typeof ContactRoute
   '/cursor-api-economica': typeof CursorApiEconomicaRoute
   '/pricing-seo': typeof PricingSeoRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap': typeof SitemapRoute
   '/user-agreement': typeof UserAgreementRoute
   '/_authenticated/system-settings': typeof AuthenticatedSystemSettingsRouteRouteWithChildren
+  '/affiliate/admin': typeof AffiliateAdminRouteRoute
+  '/affiliate/dashboard': typeof AffiliateDashboardRouteRoute
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/oauth': typeof authOauthRoute
   '/(auth)/otp': typeof authOtpRoute
@@ -671,12 +698,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/claude-barato-chile'
+    | '/contact'
     | '/cursor-api-economica'
     | '/pricing-seo'
     | '/privacy-policy'
     | '/sitemap'
     | '/user-agreement'
     | '/system-settings'
+    | '/affiliate/admin'
+    | '/affiliate/dashboard'
     | '/forgot-password'
     | '/oauth'
     | '/otp'
@@ -740,11 +770,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/claude-barato-chile'
+    | '/contact'
     | '/cursor-api-economica'
     | '/pricing-seo'
     | '/privacy-policy'
     | '/sitemap'
     | '/user-agreement'
+    | '/affiliate/admin'
+    | '/affiliate/dashboard'
     | '/forgot-password'
     | '/oauth'
     | '/otp'
@@ -810,12 +843,15 @@ export interface FileRouteTypes {
     | '/(auth)'
     | '/_authenticated'
     | '/claude-barato-chile'
+    | '/contact'
     | '/cursor-api-economica'
     | '/pricing-seo'
     | '/privacy-policy'
     | '/sitemap'
     | '/user-agreement'
     | '/_authenticated/system-settings'
+    | '/affiliate/admin'
+    | '/affiliate/dashboard'
     | '/(auth)/forgot-password'
     | '/(auth)/oauth'
     | '/(auth)/otp'
@@ -882,11 +918,14 @@ export interface RootRouteChildren {
   authRouteRoute: typeof authRouteRouteWithChildren
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   ClaudeBaratoChileRoute: typeof ClaudeBaratoChileRoute
+  ContactRoute: typeof ContactRoute
   CursorApiEconomicaRoute: typeof CursorApiEconomicaRoute
   PricingSeoRoute: typeof PricingSeoRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   SitemapRoute: typeof SitemapRoute
   UserAgreementRoute: typeof UserAgreementRoute
+  AffiliateAdminRouteRoute: typeof AffiliateAdminRouteRoute
+  AffiliateDashboardRouteRoute: typeof AffiliateDashboardRouteRoute
   errors401Route: typeof errors401Route
   errors403Route: typeof errors403Route
   errors404Route: typeof errors404Route
@@ -935,6 +974,13 @@ declare module '@tanstack/react-router' {
       path: '/claude-barato-chile'
       fullPath: '/claude-barato-chile'
       preLoaderRoute: typeof ClaudeBaratoChileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cursor-api-economica': {
@@ -1075,6 +1121,20 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about/'
       preLoaderRoute: typeof AboutIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affiliate/admin': {
+      id: '/affiliate/admin'
+      path: '/affiliate/admin'
+      fullPath: '/affiliate/admin'
+      preLoaderRoute: typeof AffiliateAdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affiliate/dashboard': {
+      id: '/affiliate/dashboard'
+      path: '/affiliate/dashboard'
+      fullPath: '/affiliate/dashboard'
+      preLoaderRoute: typeof AffiliateDashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -1532,11 +1592,14 @@ const rootRouteChildren: RootRouteChildren = {
   authRouteRoute: authRouteRouteWithChildren,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   ClaudeBaratoChileRoute: ClaudeBaratoChileRoute,
+  ContactRoute: ContactRoute,
   CursorApiEconomicaRoute: CursorApiEconomicaRoute,
   PricingSeoRoute: PricingSeoRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   SitemapRoute: SitemapRoute,
   UserAgreementRoute: UserAgreementRoute,
+  AffiliateAdminRouteRoute: AffiliateAdminRouteRoute,
+  AffiliateDashboardRouteRoute: AffiliateDashboardRouteRoute,
   errors401Route: errors401Route,
   errors403Route: errors403Route,
   errors404Route: errors404Route,
