@@ -311,7 +311,6 @@ func RequestEpay(c *gin.Context) {
 		DirectFlowPayment(c)
 	}
 }
-}
 
 // tradeNo lock
 var orderLocks sync.Map
