@@ -17,12 +17,16 @@ func SecurityHeaders() gin.HandlerFunc {
 		header.Set("X-Content-Type-Options", "nosniff")
 		header.Set("X-Frame-Options", "SAMEORIGIN")
 		header.Set("Referrer-Policy", "strict-origin-when-cross-origin")
+
+		// Performance headers
+		header.Set("X-DNS-Prefetch-Control", "on")
+
 		// HSTS is only meaningful over TLS, and sending it from a plain HTTP
 		// deployment would lock operators out of their own dashboard. The
 		// directive intentionally omits includeSubDomains so that sibling
 		// subdomains still served over HTTP keep working.
 		if c.Request.TLS != nil || common.SessionCookieSecure {
-			header.Set("Strict-Transport-Security", "max-age=31536000")
+			header.Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
 		}
 		c.Next()
 	}

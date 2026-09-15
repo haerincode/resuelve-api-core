@@ -50,7 +50,7 @@ function upsertLink(rel: string, href: string, hreflang?: string) {
 
 export function SEO({
   title = 'Resuelve-API | Claude Opus 5, Sonnet 5 y GPT-5.6 en Pesos y USDT (77% OFF)',
-  description = 'Usa Claude Opus 5, Sonnet 5 y GPT-5.6 Plus en Cursor y Cline pagando en CLP con Webpay o USDT. Sin suscripciones fijas. Hasta 77% de ahorro con prompt caching.',
+  description = 'API de Claude Opus 5, Sonnet 5 y GPT-5.6 para Chile y LatAm. Paga en CLP con Webpay o USDT. 77% descuento con caching.',
   canonical,
   ogType = 'website',
   ogImage = `${BASE_URL}/og-image.jpg`,

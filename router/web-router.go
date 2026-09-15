@@ -22,7 +22,7 @@ type WebAssets struct {
 func SetWebRouter(router *gin.Engine, assets WebAssets) {
 	frontendFS := common.EmbedFolder(assets.BuildFS, "web/dist")
 
-	router.Use(gzip.Gzip(gzip.DefaultCompression))
+	router.Use(gzip.Gzip(gzip.BestCompression))
 	router.Use(middleware.GlobalWebRateLimit())
 	router.Use(middleware.StaticAssetCache())
 	router.Use(middleware.Cache())

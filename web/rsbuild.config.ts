@@ -29,25 +29,39 @@ export default defineConfig(({ envMode }) => {
     splitChunks: {
       preset: 'default',
       cacheGroups: {
-        'vendor-react': {
+        'lib-react': {
           test: /node_modules[\\/](react|react-dom)[\\/]/,
-          name: 'vendor-react',
+          name: 'lib-react',
           chunks: 'all',
-          priority: 0,
+          priority: 10,
           enforce: true,
         },
         'vendor-ui-primitives': {
           test: /node_modules[\\/](@base-ui|@radix-ui)[\\/]/,
           name: 'vendor-ui-primitives',
           chunks: 'all',
-          priority: 0,
+          priority: 8,
           enforce: true,
         },
         'vendor-tanstack': {
           test: /node_modules[\\/]@tanstack[\\/]/,
           name: 'vendor-tanstack',
           chunks: 'all',
-          priority: 0,
+          priority: 8,
+          enforce: true,
+        },
+        'vendor-heavy': {
+          test: /node_modules[\\/](katex|marked|dompurify|framer-motion|motion)[\\/]/,
+          name: 'vendor-heavy',
+          chunks: 'async',
+          priority: 9,
+          enforce: true,
+        },
+        'vendor-forms': {
+          test: /node_modules[\\/](react-hook-form|@hookform|zod)[\\/]/,
+          name: 'vendor-forms',
+          chunks: 'async',
+          priority: 7,
           enforce: true,
         },
       },
@@ -82,9 +96,15 @@ export default defineConfig(({ envMode }) => {
       // extracted license files, which some distributions require for open-source compliance.
       assetPrefix: isProd ? '/' : undefined,
       sourceMap: {
-        js: isProd ? 'source-map' : 'cheap-module-source-map',
+        js: isProd ? false : 'cheap-module-source-map',
         css: false,
       },
+      filenameHash: isProd,
+      inlineScripts: false,
+      inlineStyles: false,
+      charset: 'utf8',
+      cleanDistPath: true,
+      dataUriLimit: 4096,
     },
     performance: {
       // Remove console in production
@@ -98,6 +118,11 @@ export default defineConfig(({ envMode }) => {
           maxInitialRequests: 30,
         },
       },
+      preload: {
+        type: 'all-chunks',
+        include: [/\.woff2$/],
+      },
+      prefetch: true,
     },
     tools: {
       rspack: {
@@ -109,7 +134,17 @@ export default defineConfig(({ envMode }) => {
             autoCodeSplitting: isProd,
           }),
         ],
+        optimization: isProd ? {
+          minimize: true,
+          usedExports: true,
+          sideEffects: true,
+          moduleIds: 'deterministic',
+          runtimeChunk: 'single',
+        } : undefined,
       },
+      lightningcss: isProd ? {
+        minify: true,
+      } : undefined,
     },
   }
 })

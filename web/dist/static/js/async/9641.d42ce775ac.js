@@ -1,0 +1,1 @@
+"use strict";(self.rspackChunknewapi_web=self.rspackChunknewapi_web||[]).push([[9641],{31232(e,s,n){n.r(s);let p=n(57535).m;n.d(s,{},{component:p})}}]);
