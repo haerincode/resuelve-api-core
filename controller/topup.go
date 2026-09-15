@@ -297,18 +297,77 @@ func RequestEpay(c *gin.Context) {
 		return
 	}
 
-	// Route to appropriate direct payment handler
+	// Route to appropriate payment gateway and create order
 	paymentMethod := strings.ToLower(req.PaymentMethod)
+
+	// Create order first
+	amount, err := getTopUpQuota(req.Amount)
+	if err != nil {
+		logger.LogError(c.Request.Context(), fmt.Sprintf("获取充值数量失败 user_id=%d amount=%d error=%q", id, req.Amount, err.Error()))
+		c.JSON(http.StatusOK, gin.H{"message": "error", "data": "获取充值数量失败"})
+		return
+	}
+
+	tradeNo := fmt.Sprintf("%s%d", common.GetRandomString(6), common.GetTimestamp())
+	tradeNo = fmt.Sprintf("USR%dNO%s", id, tradeNo)
+
+	topUp := &model.TopUp{
+		UserId:          id,
+		Amount:          amount,
+		Money:           payMoney,
+		TradeNo:         tradeNo,
+		PaymentMethod:   req.PaymentMethod,
+		PaymentProvider: model.PaymentProviderEpay,
+		CreateTime:      common.GetTimestamp(),
+		Status:          common.TopUpStatusPending,
+	}
+	err = topUp.Insert()
+	if err != nil {
+		logger.LogError(c.Request.Context(), fmt.Sprintf("创建充值订单失败 user_id=%d trade_no=%s payment_method=%s amount=%d error=%q", id, tradeNo, req.PaymentMethod, req.Amount, err.Error()))
+		c.JSON(http.StatusOK, gin.H{"message": "error", "data": "创建订单失败"})
+		return
+	}
+
+	// Get user email
+	user, _ := model.GetUserById(id, false)
+	email := "contacto@resuelve-api.lat"
+	if user != nil && user.Email != "" {
+		email = user.Email
+	}
 
 	if strings.Contains(paymentMethod, "usdt") ||
 		strings.Contains(paymentMethod, "crypto") ||
 		strings.Contains(paymentMethod, "btc") ||
 		strings.Contains(paymentMethod, "eth") {
-		// Handle crypto payment directly
-		DirectCryptoPayment(c)
+		// Handle crypto payment
+		if !usdtEnabled {
+			c.JSON(http.StatusOK, gin.H{"message": "error", "data": "Pagos con criptomonedas no disponibles"})
+			return
+		}
+
+		invoice, err := nowpaymentsService.CreateInvoice(tradeNo, payMoney, email, "Recarga Resuelve-API", "")
+		if err != nil {
+			logger.LogError(c.Request.Context(), fmt.Sprintf("NOWPayments creation failed: %v", err))
+			c.JSON(http.StatusOK, gin.H{"message": "error", "data": fmt.Sprintf("Error al crear pago crypto: %v", err)})
+			return
+		}
+
+		paymentURL := invoice.InvoiceURL
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Crypto充值订单创建成功 user_id=%d trade_no=%s amount=%d money=%.2f redirect=%s", id, tradeNo, req.Amount, payMoney, paymentURL))
+
+		c.JSON(http.StatusOK, gin.H{"message": "success", "data": gin.H{"pay_url": paymentURL}, "url": paymentURL})
 	} else {
-		// Handle Flow payment directly
-		DirectFlowPayment(c)
+		// Handle Flow payment
+		redirectURL, err := flowService.CreatePayment(tradeNo, payMoney, email, "Recarga")
+		if err != nil {
+			logger.LogError(c.Request.Context(), fmt.Sprintf("Flow payment creation failed: %v", err))
+			c.JSON(http.StatusOK, gin.H{"message": "error", "data": fmt.Sprintf("Error al crear pago: %v", err)})
+			return
+		}
+
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Flow充值订单创建成功 user_id=%d trade_no=%s amount=%d money=%.2f redirect=%s", id, tradeNo, req.Amount, payMoney, redirectURL))
+
+		c.JSON(http.StatusOK, gin.H{"message": "success", "data": gin.H{"pay_url": redirectURL}, "url": redirectURL})
 	}
 }
 
