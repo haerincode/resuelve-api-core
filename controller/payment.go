@@ -70,6 +70,7 @@ func PaymentSelector(c *gin.Context) {
 	outTradeNo := c.DefaultQuery("out_trade_no", fmt.Sprintf("RA-%d", time.Now().Unix()))
 	pid := c.DefaultQuery("pid", "1000")
 	name := c.DefaultQuery("name", "Recarga")
+	method := c.DefaultQuery("method", "")
 
 	usdtStatus := "false"
 	if usdtEnabled {
@@ -682,6 +683,15 @@ func PaymentSelector(c *gin.Context) {
         pagarClp();
       }
     });
+
+    // Auto-submit based on method parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const method = urlParams.get('method');
+    if (method === 'crypto' && USDT_ENABLED) {
+      setTimeout(() => pagarUsdt(), 500);
+    } else if (method === 'webpay') {
+      setTimeout(() => pagarClp(), 500);
+    }
   </script>
 </body>
 </html>`, money,

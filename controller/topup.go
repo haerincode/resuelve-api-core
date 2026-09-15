@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -326,8 +327,21 @@ func RequestEpay(c *gin.Context) {
 		return
 	}
 
-	// Redirect to internal payment gateway with correct amount
-	paymentURL := fmt.Sprintf("/submit.php?money=%.2f&out_trade_no=%s&pid=%d&name=Recarga", payMoney, tradeNo, id)
+	// Redirect based on payment method type
+	var paymentURL string
+	paymentMethod := strings.ToLower(req.PaymentMethod)
+
+	// Check if it's a crypto/USDT payment
+	if strings.Contains(paymentMethod, "usdt") ||
+		strings.Contains(paymentMethod, "crypto") ||
+		strings.Contains(paymentMethod, "btc") ||
+		strings.Contains(paymentMethod, "eth") {
+		// For crypto, go to selector page with crypto pre-selected
+		paymentURL = fmt.Sprintf("/submit.php?money=%.2f&out_trade_no=%s&pid=%d&name=Recarga&method=crypto", payMoney, tradeNo, id)
+	} else {
+		// For Webpay, go to selector page with webpay pre-selected
+		paymentURL = fmt.Sprintf("/submit.php?money=%.2f&out_trade_no=%s&pid=%d&name=Recarga&method=webpay", payMoney, tradeNo, id)
+	}
 
 	logger.LogInfo(c.Request.Context(), fmt.Sprintf("充值订单创建成功 user_id=%d trade_no=%s payment_method=%s amount=%d money=%.2f redirect=%s", id, tradeNo, req.PaymentMethod, req.Amount, payMoney, paymentURL))
 
