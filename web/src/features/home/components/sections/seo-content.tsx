@@ -9,9 +9,9 @@ export function SEOContent() {
   return (
     <section className='border-border/40 bg-muted/5 mx-auto max-w-6xl px-6 py-16 md:py-20'>
       <div className='prose prose-slate dark:prose-invert mx-auto max-w-4xl'>
-        <h2 className='mb-6 text-2xl font-bold tracking-tight md:text-3xl'>
+        <h1 className='mb-6 text-2xl font-bold tracking-tight md:text-3xl'>
           {t('seo.heading', 'API de Claude, GPT y Gemini para Desarrolladores en Chile y Latinoamérica')}
-        </h2>
+        </h1>
 
         <div className='text-muted-foreground space-y-4 text-base leading-relaxed'>
           <p>

@@ -38,6 +38,14 @@ export function Home() {
   const isAuthenticated = !!auth.user
   const { content, isLoaded, isUrl } = useHomePageContent()
 
+  const seoTitle = i18n.language === 'es'
+    ? 'Resuelve-API - API de Claude, GPT y Gemini para Chile y Latinoamérica'
+    : 'Resuelve-API - Claude, GPT & Gemini API Gateway for Latin America'
+
+  const seoDescription = i18n.language === 'es'
+    ? 'Gateway de alto rendimiento con acceso a modelos Claude, GPT y Gemini. Precios transparentes, baja latencia y herramientas para desarrolladores en Chile y Latinoamérica.'
+    : 'High-performance API gateway providing access to Claude, GPT, and Gemini models with transparent pricing, low latency, and developer-friendly tools for Chile and Latin America.'
+
   const syncIframePreferences = useCallback(() => {
     try {
       iframeRef.current?.contentWindow?.postMessage(
@@ -123,7 +131,11 @@ export function Home() {
 
   return (
     <PublicLayout showMainContainer={false}>
-      <SEO />
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        canonical="/"
+      />
       <Hero isAuthenticated={isAuthenticated} />
       <Stats />
       <Features />
