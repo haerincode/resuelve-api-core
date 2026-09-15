@@ -298,51 +298,22 @@ func RequestEpay(c *gin.Context) {
 		return
 	}
 
-	tradeNo := fmt.Sprintf("%s%d", common.GetRandomString(6), time.Now().Unix())
-	tradeNo = fmt.Sprintf("USR%dNO%s", id, tradeNo)
-
-	amount := req.Amount
-	if operation_setting.GetQuotaDisplayType() == operation_setting.QuotaDisplayTypeTokens {
-		dAmount := decimal.NewFromInt(int64(amount))
-		dQuotaPerUnit := decimal.NewFromFloat(common.QuotaPerUnit)
-		amount = dAmount.Div(dQuotaPerUnit).IntPart()
-	}
-	topUp := &model.TopUp{
-		UserId:          id,
-		Amount:          amount,
-		Money:           payMoney,
-		TradeNo:         tradeNo,
-		PaymentMethod:   req.PaymentMethod,
-		PaymentProvider: model.PaymentProviderEpay,
-		CreateTime:      time.Now().Unix(),
-		Status:          common.TopUpStatusPending,
-	}
-	err = topUp.Insert()
-	if err != nil {
-		logger.LogError(c.Request.Context(), fmt.Sprintf("创建充值订单失败 user_id=%d trade_no=%s payment_method=%s amount=%d error=%q", id, tradeNo, req.PaymentMethod, req.Amount, err.Error()))
-		c.JSON(http.StatusOK, gin.H{"message": "error", "data": "创建订单失败"})
-		return
-	}
-
-	// Redirect based on payment method type
-	var paymentURL string
+	// Determine which payment endpoint to use
 	paymentMethod := strings.ToLower(req.PaymentMethod)
+	var endpoint string
 
-	// Check if it's a crypto/USDT payment
 	if strings.Contains(paymentMethod, "usdt") ||
 		strings.Contains(paymentMethod, "crypto") ||
 		strings.Contains(paymentMethod, "btc") ||
 		strings.Contains(paymentMethod, "eth") {
-		// For crypto, go to selector page with crypto pre-selected
-		paymentURL = fmt.Sprintf("/submit.php?money=%.2f&out_trade_no=%s&pid=%d&name=Recarga&method=crypto", payMoney, tradeNo, id)
+		endpoint = "/api/user/pay/crypto"
 	} else {
-		// For Webpay, go to selector page with webpay pre-selected
-		paymentURL = fmt.Sprintf("/submit.php?money=%.2f&out_trade_no=%s&pid=%d&name=Recarga&method=webpay", payMoney, tradeNo, id)
+		endpoint = "/api/user/pay/flow"
 	}
 
-	logger.LogInfo(c.Request.Context(), fmt.Sprintf("充值订单创建成功 user_id=%d trade_no=%s payment_method=%s amount=%d money=%.2f redirect=%s", id, tradeNo, req.PaymentMethod, req.Amount, payMoney, paymentURL))
+	logger.LogInfo(c.Request.Context(), fmt.Sprintf("支付路由 user_id=%d payment_method=%s amount=%d endpoint=%s", id, req.PaymentMethod, req.Amount, endpoint))
 
-	c.JSON(http.StatusOK, gin.H{"message": "success", "data": gin.H{"redirect_url": paymentURL}, "url": paymentURL})
+	c.JSON(http.StatusOK, gin.H{"message": "success", "endpoint": endpoint})
 }
 
 // tradeNo lock
