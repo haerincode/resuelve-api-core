@@ -313,7 +313,7 @@ func RequestEpay(c *gin.Context) {
 
 	topUp := &model.TopUp{
 		UserId:          id,
-		Amount:          amount,
+		Amount:          int64(amount),
 		Money:           payMoney,
 		TradeNo:         tradeNo,
 		PaymentMethod:   req.PaymentMethod,
