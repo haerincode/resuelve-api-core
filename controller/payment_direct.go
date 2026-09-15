@@ -8,7 +8,6 @@ import (
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/logger"
 	"github.com/QuantumNous/new-api/model"
-	"github.com/QuantumNous/new-api/service"
 	"github.com/QuantumNous/new-api/setting/operation_setting"
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
@@ -161,14 +160,21 @@ func DirectCryptoPayment(c *gin.Context) {
 		return
 	}
 
-	// Create NOWPayments payment
-	paymentURL, err := nowpaymentsService.CreatePayment(tradeNo, payMoney, "Recarga Resuelve-API")
+	// Create NOWPayments invoice
+	user, _ := model.GetUserById(id, false)
+	email := "contacto@resuelve-api.lat"
+	if user != nil && user.Email != "" {
+		email = user.Email
+	}
+
+	invoice, err := nowpaymentsService.CreateInvoice(tradeNo, payMoney, email, "Recarga Resuelve-API", "")
 	if err != nil {
 		logger.LogError(c.Request.Context(), fmt.Sprintf("NOWPayments creation failed: %v", err))
 		c.JSON(http.StatusOK, gin.H{"message": "error", "data": fmt.Sprintf("Error al crear pago crypto: %v", err)})
 		return
 	}
 
+	paymentURL := invoice.InvoiceURL
 	logger.LogInfo(c.Request.Context(), fmt.Sprintf("Crypto充值订单创建成功 user_id=%d trade_no=%s amount=%d money=%.2f redirect=%s", id, tradeNo, req.Amount, payMoney, paymentURL))
 
 	c.JSON(http.StatusOK, gin.H{
