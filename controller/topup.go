@@ -297,22 +297,20 @@ func RequestEpay(c *gin.Context) {
 		return
 	}
 
-	// Determine which payment endpoint to use
+	// Route to appropriate direct payment handler
 	paymentMethod := strings.ToLower(req.PaymentMethod)
-	var endpoint string
 
 	if strings.Contains(paymentMethod, "usdt") ||
 		strings.Contains(paymentMethod, "crypto") ||
 		strings.Contains(paymentMethod, "btc") ||
 		strings.Contains(paymentMethod, "eth") {
-		endpoint = "/api/user/pay/crypto"
+		// Handle crypto payment directly
+		DirectCryptoPayment(c)
 	} else {
-		endpoint = "/api/user/pay/flow"
+		// Handle Flow payment directly
+		DirectFlowPayment(c)
 	}
-
-	logger.LogInfo(c.Request.Context(), fmt.Sprintf("支付路由 user_id=%d payment_method=%s amount=%d endpoint=%s", id, req.PaymentMethod, req.Amount, endpoint))
-
-	c.JSON(http.StatusOK, gin.H{"message": "success", "endpoint": endpoint})
+}
 }
 
 // tradeNo lock
