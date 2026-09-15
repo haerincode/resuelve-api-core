@@ -12,8 +12,8 @@ func SetPaymentRouter(router *gin.Engine) {
 	paymentRoute.Use(middleware.CORS())
 	paymentRoute.Use(middleware.GlobalWebRateLimit())
 	{
-		// Health check
-		paymentRoute.GET("", controller.PaymentHealth)
+		// Health check - moved to /api/payment/health to not conflict with frontend
+		paymentRoute.GET("/api/payment/health", controller.PaymentHealth)
 
 		// Payment UI
 		paymentRoute.GET("/submit.php", controller.PaymentSelector)
