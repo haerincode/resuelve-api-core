@@ -64,6 +64,16 @@ type AffiliateFraudLog struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+// AffiliateRateHistory tracks rate changes by volume
+type AffiliateRateHistory struct {
+	ID              int       `gorm:"primarykey" json:"id"`
+	AffiliateID     int       `gorm:"index" json:"affiliate_id"`
+	CommissionRate  float64   `gorm:"type:decimal(5,4)" json:"commission_rate"`
+	MonthlyVolume   float64   `gorm:"type:decimal(15,2)" json:"monthly_volume"`
+	Month           time.Time `gorm:"index" json:"month"` // First day of month
+	CreatedAt       time.Time `json:"created_at"`
+}
+
 func (Affiliate) TableName() string {
 	return "affiliates"
 }

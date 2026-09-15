@@ -375,5 +375,18 @@ func InitResources() error {
 
 	service.StartAuthArtifactCleanup()
 
+	// Initialize payment gateway services
+	controller.InitPaymentServices(
+		os.Getenv("FLOW_API_KEY"),
+		os.Getenv("FLOW_SECRET_KEY"),
+		os.Getenv("NOWPAYMENTS_API_KEY"),
+		os.Getenv("NOWPAYMENTS_IPN_SECRET"),
+		os.Getenv("PAYMENT_CALLBACK_URL"),
+		os.Getenv("PAYMENT_RETURN_URL"),
+		os.Getenv("PAYMENT_SUCCESS_URL"),
+		os.Getenv("PAYMENT_CANCEL_URL"),
+		os.Getenv("USDT_ENABLED") == "true",
+	)
+
 	return nil
 }
