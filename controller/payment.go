@@ -70,7 +70,6 @@ func PaymentSelector(c *gin.Context) {
 	outTradeNo := c.DefaultQuery("out_trade_no", fmt.Sprintf("RA-%d", time.Now().Unix()))
 	pid := c.DefaultQuery("pid", "1000")
 	name := c.DefaultQuery("name", "Recarga")
-	method := c.DefaultQuery("method", "")
 
 	usdtStatus := "false"
 	if usdtEnabled {

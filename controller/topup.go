@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 	"sync"
@@ -300,7 +299,6 @@ func RequestEpay(c *gin.Context) {
 		return
 	}
 
-	callBackAddress := service.GetCallbackAddress()
 	tradeNo := fmt.Sprintf("%s%d", common.GetRandomString(6), time.Now().Unix())
 	tradeNo = fmt.Sprintf("USR%dNO%s", id, tradeNo)
 
