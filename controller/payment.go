@@ -733,7 +733,7 @@ func getCryptoSubtitle(enabled bool) string {
 func InitiateFlowPayment(c *gin.Context) {
 	money := c.DefaultPostForm("money", "0")
 	outTradeNo := c.DefaultPostForm("out_trade_no", fmt.Sprintf("RA-%d", time.Now().Unix()))
-	email := c.DefaultPostForm("email", "user@resuelve-api.lat")
+	email := c.DefaultPostForm("email", "contacto@resuelve-api.lat")
 	name := c.DefaultPostForm("name", "Recarga")
 
 	amountUSD, err := strconv.ParseFloat(money, 64)
@@ -742,22 +742,12 @@ func InitiateFlowPayment(c *gin.Context) {
 		return
 	}
 
-	// Create payment record in DB
-	payment := model.PaymentFlow{
-		OrderID:    outTradeNo,
-		UserID:     1, // TODO: Get from auth context
-		AmountUSD:  amountUSD,
-		AmountCLP:  amountUSD * 1000,
-		Email:      email,
-		Status:     "pending",
+	// Validate email
+	if email == "" {
+		email = "contacto@resuelve-api.lat"
 	}
 
-	if err := model.DB.Create(&payment).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create payment record"})
-		return
-	}
-
-	// Call Flow API
+	// Call Flow API directly (DB record created on webhook confirmation)
 	flowURL, err := flowService.CreatePayment(outTradeNo, amountUSD, email, name)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
