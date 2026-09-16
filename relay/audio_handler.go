@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/QuantumNous/new-api/common"
+	"github.com/QuantumNous/new-api/logger"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/relay/helper"
 	"github.com/QuantumNous/new-api/relaykit/dto"
@@ -67,10 +68,35 @@ func AudioHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *type
 		service.ResetStatusCode(newAPIError, statusCodeMappingStr)
 		return newAPIError
 	}
-	if usage.(*dto.Usage).CompletionTokenDetails.AudioTokens > 0 || usage.(*dto.Usage).PromptTokensDetails.AudioTokens > 0 {
-		service.PostAudioConsumeQuota(c, info, usage.(*dto.Usage), "")
+
+	usageData := usage.(*dto.Usage)
+
+	// Para streams: solo cobrar si terminó correctamente (done/eof/handler_stop).
+	// Si el cliente se desconectó (client_gone) o hubo timeout/error, NO cobrar.
+	if info.IsStream && info.StreamStatus != nil && !info.StreamStatus.IsNormalEnd() {
+		logger.LogWarn(c, fmt.Sprintf("stream ended abnormally - reason:%s user:%d model:%s prompt_tokens:%d completion_tokens:%d",
+			info.StreamStatus.EndReason, info.UserId, info.OriginModelName, usageData.PromptTokens, usageData.CompletionTokens))
+		// Devolver el PreConsume
+		if info.Billing != nil {
+			info.Billing.Refund(c)
+		}
+		return nil
+	}
+
+	// Non-stream: validar que hay tokens consumidos (incluyendo TotalTokens para embeddings/etc)
+	if !info.IsStream && usageData.PromptTokens == 0 && usageData.CompletionTokens == 0 && usageData.TotalTokens == 0 {
+		logger.LogWarn(c, fmt.Sprintf("no tokens consumed in non-stream request - user:%d model:%s", info.UserId, info.OriginModelName))
+		// Devolver el PreConsume
+		if info.Billing != nil {
+			info.Billing.Refund(c)
+		}
+		return nil
+	}
+
+	if usageData.CompletionTokenDetails.AudioTokens > 0 || usageData.PromptTokensDetails.AudioTokens > 0 {
+		service.PostAudioConsumeQuota(c, info, usageData, "")
 	} else {
-		service.PostTextConsumeQuota(c, info, usage.(*dto.Usage), nil)
+		service.PostTextConsumeQuota(c, info, usageData, nil)
 	}
 
 	return nil

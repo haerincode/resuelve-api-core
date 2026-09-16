@@ -145,6 +145,29 @@ func ResponsesHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *
 	}
 
 	usageDto := usage.(*dto.Usage)
+
+	// Para streams: solo cobrar si terminó correctamente (done/eof/handler_stop).
+	// Si el cliente se desconectó (client_gone) o hubo timeout/error, NO cobrar.
+	if info.IsStream && info.StreamStatus != nil && !info.StreamStatus.IsNormalEnd() {
+		logger.LogWarn(c, fmt.Sprintf("stream ended abnormally - reason:%s user:%d model:%s prompt_tokens:%d completion_tokens:%d",
+			info.StreamStatus.EndReason, info.UserId, info.OriginModelName, usageDto.PromptTokens, usageDto.CompletionTokens))
+		// Devolver el PreConsume
+		if info.Billing != nil {
+			info.Billing.Refund(c)
+		}
+		return nil
+	}
+
+	// Non-stream: validar que hay tokens consumidos (incluyendo TotalTokens para embeddings/etc)
+	if !info.IsStream && usageDto.PromptTokens == 0 && usageDto.CompletionTokens == 0 && usageDto.TotalTokens == 0 {
+		logger.LogWarn(c, fmt.Sprintf("no tokens consumed in non-stream request - user:%d model:%s", info.UserId, info.OriginModelName))
+		// Devolver el PreConsume
+		if info.Billing != nil {
+			info.Billing.Refund(c)
+		}
+		return nil
+	}
+
 	if info.RelayMode == relayconstant.RelayModeResponsesCompact {
 		originModelName := info.OriginModelName
 		originPriceData := info.PriceData
