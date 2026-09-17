@@ -35,15 +35,21 @@ func SetWebRouter(router *gin.Engine, assets WebAssets) {
 			return
 		}
 
-		// Para bots (payment processors, crawlers), sirve HTML con contenido visible
+		// Rutas que SIEMPRE deben servir SPA (para bots y usuarios)
+		requireSPA := strings.HasPrefix(c.Request.RequestURI, "/privacy-policy") ||
+			strings.HasPrefix(c.Request.RequestURI, "/user-agreement") ||
+			strings.HasPrefix(c.Request.RequestURI, "/pricing") ||
+			strings.HasPrefix(c.Request.RequestURI, "/about")
+
+		// Para bots en homepage, sirve HTML con contenido visible
 		isBot, _ := c.Get("is_bot")
-		if isBot == true {
+		if isBot == true && !requireSPA {
 			c.Header("Cache-Control", "public, max-age=300")
 			c.Data(http.StatusOK, "text/html; charset=utf-8", generateBotHTML())
 			return
 		}
 
-		// Para usuarios normales, sirve SPA sin cache
+		// Para usuarios normales y rutas críticas, sirve SPA sin cache
 		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 		c.Header("Pragma", "no-cache")
 		c.Header("Expires", "0")
