@@ -97,15 +97,9 @@ function LegalLinks(props: { leadingSeparator?: boolean }) {
   }
 
   items.push({
-    key: 'terms',
-    label: t('Terms & Conditions'),
-    href: '/terms',
-  })
-
-  items.push({
     key: 'contact',
     label: t('Contact'),
-    href: '/contact',
+    href: 'mailto:soporte@resuelve-api.lat',
   })
 
   if (items.length === 0) {
