@@ -7,30 +7,39 @@ import (
 )
 
 func SetPaymentRouter(router *gin.Engine) {
-	// Public payment endpoints (no auth required)
+	// LEGACY PAYMENT ENDPOINTS - DEPRECATED
+	// These use old PaymentFlow/PaymentNOWPayments models that don't integrate with TopUp system.
+	// NEW PAYMENTS use /api/topup endpoints (controller/topup.go) which properly credit users.
+	//
+	// WARNING: These endpoints are kept for webhook compatibility ONLY.
+	// DO NOT create new payments through these - all credits must go through RequestEpay().
+
 	paymentRoute := router.Group("/")
 	paymentRoute.Use(middleware.CORS())
 	paymentRoute.Use(middleware.GlobalWebRateLimit())
 	{
-		// Health check - moved to /api/payment/health to not conflict with frontend
+		// Health check
 		paymentRoute.GET("/api/payment/health", controller.PaymentHealth)
 
-		// Payment UI
+		// DEPRECATED: Payment selector UI - do not use for new payments
+		// Use /api/topup/request instead
 		paymentRoute.GET("/submit.php", controller.PaymentSelector)
 		paymentRoute.POST("/submit.php", controller.PaymentSelector)
 
-		// Flow payment
+		// DEPRECATED: Flow direct payment - creates PaymentFlow records (no TopUp integration)
+		// Use RequestEpay() in topup.go instead
 		paymentRoute.GET("/pay/flow", controller.InitiateFlowPayment)
 		paymentRoute.POST("/pay/flow", controller.InitiateFlowPayment)
 
-		// Flow webhook (unauthenticated)
+		// Flow webhook - NOW FIXED to call RechargeEpay() and credit user balance
 		paymentRoute.POST("/api/flow/notify", controller.FlowWebhook)
 
-		// NOWPayments payment
+		// DEPRECATED: NOWPayments direct payment - hardcoded UserID=1 bug
+		// Use RequestEpay() in topup.go instead
 		paymentRoute.GET("/api/nowpayments/create", controller.InitiateNOWPaymentsPayment)
 		paymentRoute.POST("/api/nowpayments/create", controller.InitiateNOWPaymentsPayment)
 
-		// NOWPayments webhook (unauthenticated)
+		// NOWPayments webhook - NOW FIXED to call RechargeEpay() and credit user balance
 		paymentRoute.POST("/api/nowpayments/notify", controller.NOWPaymentsWebhook)
 	}
 }

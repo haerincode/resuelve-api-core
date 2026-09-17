@@ -133,21 +133,3 @@ func (pe *PromptEncryptor) DecryptPrompt(encrypted string) (string, error) {
 func IsEncryptedPrompt(s string) bool {
 	return strings.HasPrefix(s, PromptEncryptionPrefix)
 }
-
-// MustEncryptPrompt encripta un prompt o panic si falla
-func (pe *PromptEncryptor) MustEncryptPrompt(plaintext string) string {
-	encrypted, err := pe.EncryptPrompt(plaintext)
-	if err != nil {
-		panic(fmt.Sprintf("failed to encrypt prompt: %v", err))
-	}
-	return encrypted
-}
-
-// MustDecryptPrompt desencripta un prompt o panic si falla
-func (pe *PromptEncryptor) MustDecryptPrompt(encrypted string) string {
-	plaintext, err := pe.DecryptPrompt(encrypted)
-	if err != nil {
-		panic(fmt.Sprintf("failed to decrypt prompt: %v", err))
-	}
-	return plaintext
-}

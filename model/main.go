@@ -190,7 +190,7 @@ func InitDB() (err error) {
 		// MySQL charset/collation startup check: ensure Chinese-capable charset
 		if common.UsingMainDatabase(common.DatabaseTypeMySQL) {
 			if err := checkMySQLChineseSupport(DB); err != nil {
-				panic(err)
+				return err
 			}
 		}
 		if err := ensureUserQuotaColumns(DB, common.MainDatabaseType()); err != nil {
@@ -237,7 +237,7 @@ func InitLogDB() (err error) {
 		// If log DB is MySQL, also ensure Chinese-capable charset
 		if common.UsingLogDatabase(common.DatabaseTypeMySQL) {
 			if err := checkMySQLChineseSupport(LOG_DB); err != nil {
-				panic(err)
+				return err
 			}
 		}
 		sqlDB, err := LOG_DB.DB()
