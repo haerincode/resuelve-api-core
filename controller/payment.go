@@ -2,12 +2,14 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/QuantumNous/new-api/logger"
 	"github.com/QuantumNous/new-api/model"
 	"github.com/QuantumNous/new-api/service"
 	"github.com/gin-gonic/gin"
@@ -791,37 +793,46 @@ func FlowWebhook(c *gin.Context) {
 		return
 	}
 
-	// Find payment record
-	payment, err := model.GetPaymentFlowByOrderID(status.CommerceOrder)
-	if err != nil {
-		model.LogWebhook("flow", status.CommerceOrder, "", false, "", "Payment not found")
-		c.JSON(http.StatusOK, gin.H{"status": "ok"})
-		return
-	}
-
 	// Log webhook
 	payloadJSON, _ := json.Marshal(status)
 	model.LogWebhook("flow", status.CommerceOrder, "", true, string(payloadJSON), status.PaymentNetwork)
 
 	// Check if successful
-	if flowService.IsPaymentSuccessful(status) {
-		payment.Status = "success"
-		payment.FlowToken = token
-		payment.FlowOrder = status.FlowOrder
-		payment.CreditsApplied = true
-		now := time.Now()
-		payment.CreditsAppliedAt = &now
+	if !flowService.IsPaymentSuccessful(status) {
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+		return
+	}
 
-		// TODO: Credit user balance in separate service
-		// err = CreditUserBalance(payment.UserID, payment.AmountUSD)
-		// if err != nil {
-		//     LOG error
-		// }
+	// Use unified TopUp recharge system instead of legacy PaymentFlow
+	tradeNo := status.CommerceOrder
+	alreadyDone, err := model.RechargeEpay(tradeNo, "", c.ClientIP())
+	if err != nil {
+		if errors.Is(err, model.ErrTopUpNotFound) {
+			// Order doesn't exist in TopUp table, might be old PaymentFlow record
+			payment, err := model.GetPaymentFlowByOrderID(status.CommerceOrder)
+			if err != nil {
+				logger.LogError(c.Request.Context(), fmt.Sprintf("Flow webhook order not found trade_no=%s error=%q", tradeNo, err.Error()))
+				c.JSON(http.StatusOK, gin.H{"status": "ok"})
+				return
+			}
 
-		model.DB.Save(payment)
+			// Update legacy record only
+			payment.Status = "success"
+			payment.FlowToken = token
+			payment.FlowOrder = status.FlowOrder
+			payment.CreditsApplied = true
+			now := time.Now()
+			payment.CreditsAppliedAt = &now
+			model.DB.Save(payment)
+
+			logger.LogWarn(c.Request.Context(), fmt.Sprintf("Flow webhook found legacy PaymentFlow record, no credits added trade_no=%s", tradeNo))
+		} else {
+			logger.LogError(c.Request.Context(), fmt.Sprintf("Flow webhook recharge failed trade_no=%s error=%q", tradeNo, err.Error()))
+		}
+	} else if alreadyDone {
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Flow webhook duplicate callback trade_no=%s", tradeNo))
 	} else {
-		payment.Status = "failed"
-		model.DB.Save(payment)
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Flow webhook recharge success trade_no=%s", tradeNo))
 	}
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
@@ -898,6 +909,89 @@ func InitiateNOWPaymentsPayment(c *gin.Context) {
 func NOWPaymentsWebhook(c *gin.Context) {
 	if !usdtEnabled {
 		c.String(http.StatusServiceUnavailable, "USDT no configurado")
+		return
+	}
+
+	// Read body
+	bodyBytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		model.LogWebhook("nowpayments", "", "", false, "", "Body read error")
+		c.String(http.StatusBadRequest, "Invalid request")
+		return
+	}
+
+	// Parse JSON
+	var webhookData struct {
+		OrderID       string  `json:"order_id"`
+		PaymentID     string  `json:"payment_id"`
+		PaymentStatus string  `json:"payment_status"`
+		PriceAmount   float64 `json:"price_amount"`
+		ActuallyPaid  float64 `json:"actually_paid"`
+	}
+	if err := json.Unmarshal(bodyBytes, &webhookData); err != nil {
+		model.LogWebhook("nowpayments", "", "", false, "", "JSON parse error")
+		c.String(http.StatusBadRequest, "Invalid JSON")
+		return
+	}
+
+	// Verify signature
+	sig := c.GetHeader("x-nowpayments-sig")
+	var bodyMap map[string]interface{}
+	json.Unmarshal(bodyBytes, &bodyMap)
+	if !model.VerifyNOWPaymentsSignature(bodyMap, sig, nowpaymentsService.IPNSecret) {
+		model.LogWebhook("nowpayments", webhookData.OrderID, sig, false, string(bodyBytes), webhookData.PaymentStatus)
+		c.String(http.StatusUnauthorized, "Signature invalid")
+		return
+	}
+
+	// Log webhook
+	model.LogWebhook("nowpayments", webhookData.OrderID, sig, true, string(bodyBytes), webhookData.PaymentStatus)
+
+	// Check if payment confirmed
+	if !nowpaymentsService.IsPaymentConfirmed(webhookData.PaymentStatus) {
+		c.String(http.StatusOK, "OK")
+		return
+	}
+
+	// Check for partial payment
+	if webhookData.ActuallyPaid < webhookData.PriceAmount*0.99 { // Allow 1% variance
+		logger.LogWarn(c.Request.Context(), fmt.Sprintf("NOWPayments partial payment order_id=%s expected=%.2f paid=%.2f", webhookData.OrderID, webhookData.PriceAmount, webhookData.ActuallyPaid))
+		c.String(http.StatusOK, "OK")
+		return
+	}
+
+	// Use unified TopUp recharge system
+	tradeNo := webhookData.OrderID
+	alreadyDone, err := model.RechargeEpay(tradeNo, "crypto", c.ClientIP())
+	if err != nil {
+		if errors.Is(err, model.ErrTopUpNotFound) {
+			// Order doesn't exist in TopUp table, might be old PaymentNOWPayments record
+			payment, err := model.GetPaymentNOWPaymentsByOrderID(webhookData.OrderID)
+			if err != nil {
+				logger.LogError(c.Request.Context(), fmt.Sprintf("NOWPayments webhook order not found trade_no=%s error=%q", tradeNo, err.Error()))
+				c.String(http.StatusOK, "OK")
+				return
+			}
+
+			// Update legacy record only
+			payment.Status = "confirmed"
+			payment.CreditsApplied = true
+			now := time.Now()
+			payment.CreditsAppliedAt = &now
+			model.DB.Save(payment)
+
+			logger.LogWarn(c.Request.Context(), fmt.Sprintf("NOWPayments webhook found legacy record, no credits added trade_no=%s", tradeNo))
+		} else {
+			logger.LogError(c.Request.Context(), fmt.Sprintf("NOWPayments webhook recharge failed trade_no=%s error=%q", tradeNo, err.Error()))
+		}
+	} else if alreadyDone {
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("NOWPayments webhook duplicate callback trade_no=%s", tradeNo))
+	} else {
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("NOWPayments webhook recharge success trade_no=%s", tradeNo))
+	}
+
+	c.String(http.StatusOK, "OK")
+}
 		return
 	}
 
