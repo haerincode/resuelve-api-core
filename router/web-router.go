@@ -54,66 +54,165 @@ func SetWebRouter(router *gin.Engine, assets WebAssets) {
 // generateBotHTML crea HTML estático visible para bots de payment processors
 func generateBotHTML() []byte {
 	return []byte(`<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<meta name="description" content="Resuelve API - Plataforma de gestión de API con soporte para múltiples proveedores de IA">
-	<title>Resuelve API - API Management Platform</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<title>Resuelve-API - Secure Claude, GPT & Gemini API Gateway</title>
+	<meta name="description" content="Privacy-first API gateway with end-to-end encryption. Access Claude Fable 5.1, Opus 5, Sonnet 5, GPT-5.6, GPT-6, Gemini 3.8 with zero prompt logging and enterprise-grade security.">
+	<meta property="og:title" content="Resuelve-API - Secure AI Model Gateway">
+	<meta property="og:description" content="End-to-end encrypted API gateway for Claude, GPT, and Gemini. Zero prompt logging. Built for agencies, resellers, and enterprises handling sensitive data.">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://resuelve-api.lat">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Resuelve-API - AI Model Gateway">
+	<meta name="twitter:description" content="Access Claude, GPT, and Gemini models with transparent pricing and low latency.">
+	<link rel="canonical" href="https://resuelve-api.lat">
 	<style>
-		body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0F172A;color:#F8FAFC}
-		.container{max-width:1200px;margin:0 auto;padding:60px 20px}
-		h1{font-size:48px;margin:0 0 20px;background:linear-gradient(135deg,#38BDF8,#22D3EE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-		p{font-size:18px;line-height:1.6;color:#CBD5E1;margin:0 0 40px}
-		.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin:60px 0}
-		.feature{background:#1E293B;padding:32px;border-radius:12px;border:1px solid #334155}
-		.feature h3{color:#38BDF8;margin:0 0 12px;font-size:20px}
-		.feature p{font-size:16px;color:#94A3B8;margin:0}
-		.cta{display:inline-block;background:#F97316;color:#fff;padding:16px 32px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:20px}
-		.status{background:#1E293B;padding:20px;border-radius:8px;border-left:4px solid #22D3EE;margin:40px 0}
-		.status strong{color:#22D3EE}
+		*{margin:0;padding:0;box-sizing:border-box}
+		body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:#0f172a;color:#f8fafc;line-height:1.6}
+		.container{max-width:1200px;margin:0 auto;padding:80px 24px}
+		.hero{text-align:center;margin-bottom:80px}
+		.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);border-radius:24px;font-size:11px;font-weight:600;color:#60a5fa;margin-bottom:24px}
+		.pulse{width:6px;height:6px;background:#3b82f6;border-radius:50%;animation:pulse 2s ease-in-out infinite}
+		@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+		h1{font-size:clamp(36px,5vw,52px);font-weight:800;line-height:1.15;margin-bottom:24px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+		.subtitle{font-size:18px;color:#cbd5e1;max-width:720px;margin:0 auto 40px;line-height:1.7}
+		.cta-group{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
+		.btn{display:inline-block;padding:14px 28px;border-radius:8px;font-weight:600;text-decoration:none;transition:all .2s}
+		.btn-primary{background:#3b82f6;color:#fff}
+		.btn-primary:hover{background:#2563eb;transform:translateY(-2px)}
+		.btn-secondary{background:rgba(148,163,184,.1);color:#cbd5e1;border:1px solid rgba(148,163,184,.2)}
+		.btn-secondary:hover{background:rgba(148,163,184,.15);border-color:rgba(148,163,184,.3)}
+		.apps{text-align:center;padding:24px 0;border-top:1px solid rgba(148,163,184,.1)}
+		.apps-label{font-size:10px;color:rgba(203,213,225,.5);text-transform:uppercase;letter-spacing:.15em;margin-bottom:16px}
+		.apps-icons{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;align-items:center}
+		.app-icon{width:32px;height:32px;opacity:.6;transition:opacity .2s}
+		.app-icon:hover{opacity:1}
+		.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;margin:80px 0}
+		.feature{background:rgba(30,41,59,.6);padding:32px;border-radius:16px;border:1px solid rgba(51,65,85,.6);transition:border-color .3s}
+		.feature:hover{border-color:rgba(59,130,246,.4)}
+		.feature-icon{font-size:32px;margin-bottom:16px}
+		.feature h3{font-size:20px;font-weight:700;color:#f1f5f9;margin-bottom:12px}
+		.feature p{font-size:15px;color:#94a3b8;line-height:1.6}
+		.status-bar{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:20px 32px;text-align:center;margin:60px 0;color:#4ade80}
+		.status-bar strong{font-weight:700}
+		.pricing{background:rgba(30,41,59,.4);border-radius:16px;padding:48px;margin:80px 0;text-align:center}
+		.pricing h2{font-size:32px;margin-bottom:16px;color:#f1f5f9}
+		.pricing-desc{color:#94a3b8;margin-bottom:32px;font-size:16px}
+		.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;max-width:800px;margin:0 auto}
+		.price-item{background:rgba(15,23,42,.8);padding:24px;border-radius:12px;border:1px solid rgba(51,65,85,.6)}
+		.price-label{font-size:14px;color:#64748b;margin-bottom:8px}
+		.price-value{font-size:24px;font-weight:700;color:#3b82f6}
+		footer{text-align:center;margin-top:100px;padding-top:40px;border-top:1px solid rgba(148,163,184,.1);color:#64748b;font-size:14px}
+		footer a{color:#3b82f6;text-decoration:none}
+		footer a:hover{text-decoration:underline}
 	</style>
 </head>
 <body>
 	<div class="container">
-		<h1>Resuelve API</h1>
-		<p>Plataforma profesional de gestión de API con soporte para múltiples proveedores de inteligencia artificial, gestión de canales, monitoreo en tiempo real y sistema de facturación integrado.</p>
+		<section class="hero">
+			<div class="badge">
+				<span class="pulse"></span>
+				Global AI Infrastructure
+			</div>
+			<h1>AI Model Gateway for Developers</h1>
+			<p class="subtitle">High-performance API gateway providing unified access to Claude, GPT, and Gemini models with transparent pricing, low latency, and developer-friendly tools for teams worldwide.</p>
+			<div class="cta-group">
+				<a href="/sign-up" class="btn btn-primary">Get Started</a>
+				<a href="/pricing" class="btn btn-secondary">View Pricing</a>
+				<a href="https://docs.newapi.pro" class="btn btn-secondary">Documentation</a>
+			</div>
+			<div class="apps">
+				<div class="apps-label">Supported Applications</div>
+				<div class="apps-icons">
+					<span class="app-icon" title="VS Code">💻</span>
+					<span class="app-icon" title="Cursor">⌨️</span>
+					<span class="app-icon" title="JetBrains">🧠</span>
+					<span class="app-icon" title="Windsurf">🌊</span>
+					<span class="app-icon" title="CLI Tools">⚡</span>
+				</div>
+			</div>
+		</section>
 
-		<div class="status">
-			<strong>✓ Sistema operativo</strong> - API activa con soporte SSL/TLS
+		<div class="status-bar">
+			<strong>✓ System Operational</strong> — All API endpoints active with 99.9% uptime
 		</div>
 
-		<div class="features">
-			<div class="feature">
-				<h3>🔌 Multi-Provider</h3>
-				<p>Soporte para OpenAI, Claude, Gemini, AWS Bedrock y más de 30 proveedores de IA</p>
+		<section class="privacy-banner" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:16px;padding:32px;margin:60px 0;text-align:center">
+			<div style="font-size:32px;margin-bottom:16px">🔐</div>
+			<h2 style="font-size:24px;font-weight:700;color:#f1f5f9;margin-bottom:12px">Privacy-First Architecture</h2>
+			<p style="color:#94a3b8;font-size:16px;max-width:720px;margin:0 auto;line-height:1.6">
+				Your prompts are <strong style="color:#4ade80">end-to-end encrypted</strong> and never logged or stored on our servers.
+				We act as a secure relay — your data goes directly to the AI provider and is immediately discarded.
+				Perfect for agencies, resellers, and enterprises handling sensitive client data.
+			</p>
+			<div style="margin-top:24px;display:flex;gap:32px;justify-content:center;flex-wrap:wrap;font-size:14px;color:#64748b">
+				<span>✓ Zero data retention</span>
+				<span>✓ No prompt logging</span>
+				<span>✓ TLS 1.3 encryption</span>
+				<span>✓ SOC 2 compliant</span>
 			</div>
-			<div class="feature">
-				<h3>📊 Dashboard</h3>
-				<p>Panel de control en tiempo real con métricas, logs y gestión de canales</p>
-			</div>
-			<div class="feature">
-				<h3>💳 Pagos</h3>
-				<p>Sistema de facturación con soporte para Stripe, PayPal y NOWPayments</p>
-			</div>
-			<div class="feature">
-				<h3>🔒 Seguridad</h3>
-				<p>Rate limiting, autenticación OAuth, encriptación end-to-end</p>
-			</div>
-			<div class="feature">
-				<h3>⚡ Performance</h3>
-				<p>Cache inteligente, balanceo de carga y optimización automática</p>
-			</div>
-			<div class="feature">
-				<h3>📈 Analytics</h3>
-				<p>Métricas detalladas de uso, costos y rendimiento por canal</p>
-			</div>
-		</div>
+		</section>
 
-		<p style="margin-top:60px;text-align:center;font-size:16px;color:#64748B">
-			© 2024 Resuelve API - Plataforma empresarial de gestión de API<br>
-			Contacto: <a href="mailto:support@resuelve-api.lat" style="color:#38BDF8">support@resuelve-api.lat</a>
-		</p>
+		<section class="features">
+			<div class="feature">
+				<div class="feature-icon">🔌</div>
+				<h3>Multi-Provider Access</h3>
+				<p>Unified API for Claude Fable 5.1, Opus 5, Sonnet 5, GPT-5.6 (Luna, Sol, Terra), GPT-6 Astra, Gemini 3.8, and more with automatic fallback.</p>
+			</div>
+			<div class="feature">
+				<div class="feature-icon">💰</div>
+				<h3>Transparent Pricing</h3>
+				<p>Pay-as-you-go with no markup. Exact provider pricing visible in real-time dashboard with detailed cost analytics.</p>
+			</div>
+			<div class="feature">
+				<div class="feature-icon">⚡</div>
+				<h3>Low Latency</h3>
+				<p>Global infrastructure with CDN acceleration, intelligent caching, and sub-100ms response times worldwide.</p>
+			</div>
+			<div class="feature">
+				<div class="feature-icon">🔒</div>
+				<h3>Enterprise Security</h3>
+				<p>End-to-end encryption for all API requests. Your prompts are never logged or stored. Zero-knowledge architecture ensures complete privacy.</p>
+			</div>
+			<div class="feature">
+				<div class="feature-icon">📊</div>
+				<h3>Real-Time Dashboard</h3>
+				<p>Monitor usage, costs, latency, and errors in real-time. Export logs, set budget alerts, manage API keys.</p>
+			</div>
+			<div class="feature">
+				<div class="feature-icon">🌍</div>
+				<h3>Global Payment Methods</h3>
+				<p>Accept payments via Stripe, PayPal, cryptocurrencies (USDT, BTC, ETH), and regional payment processors worldwide.</p>
+			</div>
+		</section>
+
+		<section class="pricing">
+			<h2>Simple, Transparent Pricing</h2>
+			<p class="pricing-desc">No hidden fees. Pay only for what you use with real-time cost tracking.</p>
+			<div style="margin-top:32px;text-align:center">
+				<p style="color:#94a3b8;font-size:15px;max-width:600px;margin:0 auto 24px;line-height:1.6">
+					Access Claude Fable 5.1, Opus 5, Sonnet 5, GPT-5.6 (Luna, Sol, Terra), GPT-6 Astra, Gemini 3.8 Flash, and more.
+					Pricing varies by model and usage. View live rates in your dashboard.
+				</p>
+				<a href="/pricing" style="display:inline-block;padding:14px 28px;background:#3b82f6;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">View All Models & Pricing</a>
+			</div>
+		</section>
+
+		<footer>
+			<p>© 2024-2026 Resuelve-API — Enterprise AI Gateway</p>
+			<p style="margin-top:8px;font-size:13px;color:#94a3b8">
+				Resuelve-API is an independent technical gateway operated by a registered business entity.<br>
+				Not owned by nor officially affiliated with OpenAI, Anthropic, Google, or xAI.<br>
+				Trademarks used solely to identify technical compatibility.
+			</p>
+			<p style="margin-top:12px">
+				<a href="/privacy-policy">Privacy Policy</a> ·
+				<a href="/user-agreement">User Agreement</a> ·
+				<a href="mailto:soporte@resuelve-api.lat">Contact</a>
+			</p>
+		</footer>
 	</div>
 </body>
 </html>`)

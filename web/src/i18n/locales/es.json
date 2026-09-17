@@ -5354,7 +5354,7 @@
     "pricing.why.title": "Misma inteligencia, sin sobreprecio corporativo",
     "pricing.why.wholesale": "Acceso Mayorista: Agrupamos demanda y nos conectamos a infraestructura enterprise por volumen.",
     "pricing.why.caching": "Prompt Caching Real: En editores como Cursor, la mayor parte del código se lee desde caché, reduciendo el costo hasta un 90%.",
-    "pricing.why.payg": "Pay-As-You-Go: Cero mensualidades fijas. Cargas cuando necesitas y el saldo no vence.",
+    "pricing.why.payg": "Pay-As-You-Go: Cero mensualidades fijas. Cargas cuando necesitas.",
     "pricing.claude.sonnet": "Claude Sonnet 5: Oficial $3.00 → Resuelve-API: $0.70 (Caché: $0.070)",
     "pricing.claude.opus": "Claude Opus 5: Oficial $5.00 → Resuelve-API: $1.75 (Caché: $0.170)",
     "pricing.gpt.sol": "GPT-5.6 Sol: Oficial $2.50 → Resuelve-API: $0.50",

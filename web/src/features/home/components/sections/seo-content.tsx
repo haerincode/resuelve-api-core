@@ -92,10 +92,6 @@ export function SEOContent() {
               {t('Documentación Técnica')}
             </a>
             <span className='text-muted-foreground'>•</span>
-            <a href='/affiliates' className='text-primary hover:underline'>
-              {t('Programa de Afiliados')}
-            </a>
-            <span className='text-muted-foreground'>•</span>
             <a href='/about' className='text-primary hover:underline'>
               {t('Sobre Nosotros')}
             </a>
