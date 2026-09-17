@@ -33,7 +33,10 @@ func SetWebRouter(router *gin.Engine, assets WebAssets) {
 			controller.RelayNotFound(c)
 			return
 		}
-		c.Header("Cache-Control", "no-cache")
+		// Force no-cache for index.html to prevent the flash effect
+		c.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
 		c.Data(http.StatusOK, "text/html; charset=utf-8", assets.IndexPage)
 	})
 }

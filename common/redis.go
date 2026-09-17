@@ -22,9 +22,15 @@ func RedisKeyCacheSeconds() int {
 
 // InitRedisClient This function is called after init()
 func InitRedisClient() (err error) {
-	if os.Getenv("REDIS_CONN_STRING") == "" {
+	// Try REDIS_URL first (Heroku standard), fallback to REDIS_CONN_STRING
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL == "" {
+		redisURL = os.Getenv("REDIS_CONN_STRING")
+	}
+
+	if redisURL == "" {
 		RedisEnabled = false
-		SysLog("REDIS_CONN_STRING not set, Redis is not enabled")
+		SysLog("REDIS_URL and REDIS_CONN_STRING not set, Redis is not enabled")
 		return nil
 	}
 	if os.Getenv("SYNC_FREQUENCY") == "" {
@@ -32,10 +38,17 @@ func InitRedisClient() (err error) {
 		SyncFrequency = 60
 	}
 	SysLog("Redis is enabled")
-	opt, err := redis.ParseURL(os.Getenv("REDIS_CONN_STRING"))
+	opt, err := redis.ParseURL(redisURL)
 	if err != nil {
 		FatalLog("failed to parse Redis connection string: " + err.Error())
 	}
+
+	// Apply TLS_INSECURE_SKIP_VERIFY if set (for Heroku Redis certificate issues)
+	if opt.TLSConfig != nil && TLSInsecureSkipVerify {
+		opt.TLSConfig.InsecureSkipVerify = true
+		SysLog("Redis TLS certificate verification disabled (TLS_INSECURE_SKIP_VERIFY=true)")
+	}
+
 	opt.PoolSize = GetEnvOrDefault("REDIS_POOL_SIZE", 10)
 	RDB = redis.NewClient(opt)
 
@@ -49,15 +62,29 @@ func InitRedisClient() (err error) {
 	if DebugEnabled {
 		SysLog(fmt.Sprintf("Redis connected to %s", opt.Addr))
 		SysLog(fmt.Sprintf("Redis database: %d", opt.DB))
+	} else {
+		SysLog(fmt.Sprintf("Redis connected successfully"))
 	}
 	return err
 }
 
 func ParseRedisOption() *redis.Options {
-	opt, err := redis.ParseURL(os.Getenv("REDIS_CONN_STRING"))
+	// Try REDIS_URL first (Heroku standard), fallback to REDIS_CONN_STRING
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL == "" {
+		redisURL = os.Getenv("REDIS_CONN_STRING")
+	}
+
+	opt, err := redis.ParseURL(redisURL)
 	if err != nil {
 		FatalLog("failed to parse Redis connection string: " + err.Error())
 	}
+
+	// Apply TLS_INSECURE_SKIP_VERIFY if set
+	if opt.TLSConfig != nil && TLSInsecureSkipVerify {
+		opt.TLSConfig.InsecureSkipVerify = true
+	}
+
 	return opt
 }
 

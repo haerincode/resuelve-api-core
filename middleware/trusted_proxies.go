@@ -22,7 +22,8 @@ var defaultTrustedProxyCIDRs = []string{
 func ConfigureTrustedProxies(engine *gin.Engine) error {
 	rawTrustedProxies := strings.TrimSpace(os.Getenv("TRUSTED_PROXIES"))
 	if rawTrustedProxies == "" {
-		log.Print("WARNING: TRUSTED_PROXIES is unset or blank; trusting loopback, RFC 1918, and IPv6 ULA proxy addresses for compatibility. Set TRUSTED_PROXIES=none to trust no proxies, or configure explicit proxy IPs/CIDRs to replace these defaults.")
+		// For Heroku and cloud platforms, default to trusting common private networks
+		log.Print("WARNING: TRUSTED_PROXIES is unset; trusting loopback, RFC 1918, and IPv6 ULA proxy addresses. For Heroku, this is typically correct. Set TRUSTED_PROXIES=none to trust no proxies, or configure explicit proxy IPs/CIDRs.")
 		return engine.SetTrustedProxies(defaultTrustedProxyCIDRs)
 	}
 	if strings.EqualFold(rawTrustedProxies, "none") {
@@ -47,5 +48,6 @@ func ConfigureTrustedProxies(engine *gin.Engine) error {
 	if err := engine.SetTrustedProxies(trustedProxies); err != nil {
 		return fmt.Errorf("invalid TRUSTED_PROXIES: %w", err)
 	}
+	log.Printf("Configured trusted proxies: %v", trustedProxies)
 	return nil
 }
