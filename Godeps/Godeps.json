@@ -1,0 +1,10 @@
+{
+  "name": "resuelve-api-core",
+  "go": {
+    "goVersion": "go1.23",
+    "install": [
+      ".",
+      "./cmd/worker"
+    ]
+  }
+}
