@@ -71,6 +71,10 @@ func SetRelayRouter(router *gin.Engine) {
 	relayV1Router.Use(middleware.SystemPerformanceCheck())
 	relayV1Router.Use(middleware.TokenAuth())
 	relayV1Router.Use(middleware.ModelRequestRateLimit())
+
+	// Task polling endpoint (no Distribute middleware - no model routing needed)
+	relayV1Router.GET("/tasks/:task_id", controller.GetTaskStatus)
+
 	{
 		// WebSocket 路由（统一到 Relay）
 		wsRouter := relayV1Router.Group("")
@@ -99,7 +103,6 @@ func SetRelayRouter(router *gin.Engine) {
 
 		// Async chat completions (new)
 		httpRouter.POST("/chat/completions/async", controller.RelayAsyncChatCompletions)
-		httpRouter.GET("/tasks/:task_id", controller.GetTaskStatus)
 
 		// response related routes
 		httpRouter.POST("/responses", func(c *gin.Context) {
