@@ -84,6 +84,10 @@ func InitWorkerResources() error {
 		return fmt.Errorf("Redis required for worker but not enabled")
 	}
 
+	// Init HTTP client for upstream requests
+	service.InitHttpClient()
+	common.SysLog("HTTP client initialized")
+
 	return nil
 }
 
