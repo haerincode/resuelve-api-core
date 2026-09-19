@@ -527,6 +527,14 @@ func doRequest(c *gin.Context, req *http.Request, info *common.RelayInfo) (*http
 				}
 			}()
 		}
+	} else {
+		// Apply timeout only for non-streaming requests to prevent H12 timeout on Heroku
+		// Streaming requests use SSE keepalive pings to maintain connection
+		if common2.RelayTimeout > 0 {
+			ctx, cancel := context.WithTimeout(req.Context(), time.Duration(common2.RelayTimeout)*time.Second)
+			defer cancel()
+			req = req.WithContext(ctx)
+		}
 	}
 
 	resp, err := relayClient.Do(req)
