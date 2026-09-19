@@ -352,3 +352,62 @@ func RedisHSetField(key, field string, value interface{}) error {
 	}
 	return nil
 }
+
+// RedisLPush Push value to head of list
+func RedisLPush(key string, value string) error {
+	if DebugEnabled {
+		SysLog(fmt.Sprintf("Redis LPUSH: key=%s, value=%s", key, value))
+	}
+	ctx := context.Background()
+	return RDB.LPush(ctx, key, value).Err()
+}
+
+// RedisRPush Push value to tail of list
+func RedisRPush(key string, value string) error {
+	if DebugEnabled {
+		SysLog(fmt.Sprintf("Redis RPUSH: key=%s, value=%s", key, value))
+	}
+	ctx := context.Background()
+	return RDB.RPush(ctx, key, value).Err()
+}
+
+// RedisBRPop Blocking pop from tail of list
+func RedisBRPop(key string, timeout time.Duration) (string, error) {
+	ctx := context.Background()
+	result, err := RDB.BRPop(ctx, timeout, key).Result()
+	if err != nil {
+		return "", err
+	}
+	if len(result) < 2 {
+		return "", fmt.Errorf("unexpected BRPop result length: %d", len(result))
+	}
+	// result[0] is key, result[1] is value
+	return result[1], nil
+}
+
+// RedisLLen Get list length
+func RedisLLen(key string) (int64, error) {
+	if DebugEnabled {
+		SysLog(fmt.Sprintf("Redis LLEN: key=%s", key))
+	}
+	ctx := context.Background()
+	return RDB.LLen(ctx, key).Result()
+}
+
+// RedisLRange Get range of list elements
+func RedisLRange(key string, start, stop int64) ([]string, error) {
+	if DebugEnabled {
+		SysLog(fmt.Sprintf("Redis LRANGE: key=%s, start=%d, stop=%d", key, start, stop))
+	}
+	ctx := context.Background()
+	return RDB.LRange(ctx, key, start, stop).Result()
+}
+
+// RedisExpire Set expiration on key
+func RedisExpire(key string, expiration time.Duration) error {
+	if DebugEnabled {
+		SysLog(fmt.Sprintf("Redis EXPIRE: key=%s, expiration=%v", key, expiration))
+	}
+	ctx := context.Background()
+	return RDB.Expire(ctx, key, expiration).Err()
+}

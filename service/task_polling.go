@@ -118,8 +118,21 @@ func RunTaskPollingOnce(ctx context.Context, report func(processed, total int)) 
 	sweepTimedOutTasks(ctx)
 	allTasks := model.GetAllUnFinishSyncTasks(constant.TaskQueryLimit)
 	summary.UnfinishedTasks = len(allTasks)
+
+	// Filter out recently queued tasks (age < 30s) - let worker process them first
+	now := time.Now().Unix()
+	filteredTasks := make([]*model.Task, 0, len(allTasks))
+	for _, task := range allTasks {
+		taskAge := now - task.CreatedAt
+		if taskAge < 30 {
+			// Skip tasks queued in last 30s - worker should pick them up
+			continue
+		}
+		filteredTasks = append(filteredTasks, task)
+	}
+
 	platformTask := make(map[constant.TaskPlatform][]*model.Task)
-	for _, t := range allTasks {
+	for _, t := range filteredTasks {
 		platformTask[t.Platform] = append(platformTask[t.Platform], t)
 	}
 

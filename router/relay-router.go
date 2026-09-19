@@ -97,6 +97,10 @@ func SetRelayRouter(router *gin.Engine) {
 			controller.Relay(c, types.RelayFormatOpenAI)
 		})
 
+		// Async chat completions (new)
+		httpRouter.POST("/chat/completions/async", controller.RelayAsyncChatCompletions)
+		httpRouter.GET("/tasks/:task_id", controller.GetTaskStatus)
+
 		// response related routes
 		httpRouter.POST("/responses", func(c *gin.Context) {
 			controller.Relay(c, types.RelayFormatOpenAIResponses)

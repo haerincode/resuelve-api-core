@@ -47,3 +47,5 @@ go.work.sum
 # Allow web/dist for Heroku deployment
 !web/dist
 resuelve-api 
+bin/*
+!bin/.gitkeep

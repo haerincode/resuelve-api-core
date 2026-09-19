@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -295,6 +297,126 @@ func fastTokenCountMetaForPricing(request dto.Request) *types.TokenCountMeta {
 		// Best-effort: leave CombineText empty to avoid large allocations.
 	}
 	return meta
+}
+
+// RelayAsyncChatCompletions Handle async chat completion submission
+func RelayAsyncChatCompletions(c *gin.Context) {
+	// Read request body
+	bodyBytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to read request body"})
+		return
+	}
+	c.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+
+	// Parse request
+	var chatReq dto.GeneralOpenAIRequest
+	err = json.Unmarshal(bodyBytes, &chatReq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON request"})
+		return
+	}
+
+	// Get user/channel from middleware context
+	userId := common.GetContextKeyInt(c, constant.ContextKeyUserId)
+	channelId := common.GetContextKeyInt(c, constant.ContextKeyChannelId)
+	requestId := c.GetString(common.RequestIdKey)
+	modelName := common.GetContextKeyString(c, constant.ContextKeyOriginalModel)
+
+	if modelName == "" {
+		modelName = chatReq.Model
+	}
+
+	// Create task record
+	task := &model.Task{
+		TaskID:     model.GenerateTaskID(),
+		Platform:   constant.TaskPlatformSuno, // Reuse existing platform constant
+		UserId:     userId,
+		ChannelId:  channelId,
+		Action:     "chat.completions",
+		Status:     model.TaskStatusQueued,
+		CreatedAt:  time.Now().Unix(),
+		SubmitTime: time.Now().Unix(),
+		Progress:   "0%",
+	}
+	task.SetData(chatReq)
+
+	err = task.Insert()
+	if err != nil {
+		common.SysError(fmt.Sprintf("Failed to insert task: %v", err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create task"})
+		return
+	}
+
+	// Queue to Redis for worker pickup
+	job := &service.StreamJob{
+		ID:        task.TaskID,
+		RequestID: requestId,
+		UserID:    userId,
+		ChannelID: channelId,
+		ModelName: modelName,
+		Request:   bodyBytes,
+		CreatedAt: time.Now().Unix(),
+	}
+
+	err = service.QueueStreamJob(job)
+	if err != nil {
+		common.SysError(fmt.Sprintf("Failed to queue job: %v", err))
+		// Update task failure
+		task.Status = model.TaskStatusFailure
+		task.FailReason = fmt.Sprintf("queue failed: %v", err)
+		_ = task.Update()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to queue job"})
+		return
+	}
+
+	// Return task_id immediately
+	c.JSON(http.StatusAccepted, gin.H{
+		"task_id": task.TaskID,
+		"status":  "queued",
+	})
+}
+
+// GetTaskStatus Poll task status and retrieve chunks
+func GetTaskStatus(c *gin.Context) {
+	taskID := c.Param("task_id")
+	userId := common.GetContextKeyInt(c, constant.ContextKeyUserId)
+
+	// Load task from DB
+	task, exist, err := model.GetByTaskId(userId, taskID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get task"})
+		return
+	}
+	if !exist {
+		c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+		return
+	}
+
+	// Load chunks from Redis
+	chunks, err := service.GetTaskChunks(taskID)
+	if err != nil {
+		common.SysError(fmt.Sprintf("Failed to get chunks for task %s: %v", taskID, err))
+		chunks = []string{}
+	}
+
+	// Build response
+	response := gin.H{
+		"task_id":  task.TaskID,
+		"status":   string(task.Status),
+		"progress": task.Progress,
+		"chunks":   chunks,
+	}
+
+	if task.Status == model.TaskStatusFailure {
+		response["error"] = task.FailReason
+	}
+
+	if task.Status == model.TaskStatusSuccess {
+		response["finish_time"] = task.FinishTime
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func getChannel(c *gin.Context, info *relaycommon.RelayInfo, retryParam *service.RetryParam) (*model.Channel, *types.NewAPIError) {
