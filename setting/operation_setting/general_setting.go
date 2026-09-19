@@ -26,7 +26,7 @@ type GeneralSetting struct {
 var generalSetting = GeneralSetting{
 	DocsLink:                   "https://app.notion.so/Gu-a-b-sica-de-instalaci-n-3c9419e6bf3c8002b302eff6923274b6",
 	PingIntervalEnabled:        true,
-	PingIntervalSeconds:        60,
+	PingIntervalSeconds:        15, // 15s para evitar H12 timeout en Heroku (límite 30s)
 	QuotaDisplayType:           QuotaDisplayTypeUSD,
 	CustomCurrencySymbol:       "¤",
 	CustomCurrencyExchangeRate: 1.0,
