@@ -523,6 +523,9 @@ func doRequest(c *gin.Context, req *http.Request, info *common.RelayInfo) (*http
 		helper.ExtendWriteDeadline(c)
 		if err := helper.PingData(c); err == nil {
 			c.Writer.Flush()
+			logger.LogDebug(c, "Initial SSE ping sent and flushed")
+		} else {
+			logger.LogError(c, "Initial SSE ping failed: "+err.Error())
 		}
 
 		// 处理流式请求的 ping 保活
@@ -539,9 +542,15 @@ func doRequest(c *gin.Context, req *http.Request, info *common.RelayInfo) (*http
 				}
 			}()
 		}
+		// Apply timeout to streaming requests to force upstream response before Heroku H12/H15 timeout
+		// Heroku kills connections after 30s (H12) or 55s idle (H15) regardless of SSE keepalive
+		if common2.RelayTimeout > 0 {
+			ctx, cancel := context.WithTimeout(req.Context(), time.Duration(common2.RelayTimeout)*time.Second)
+			defer cancel()
+			req = req.WithContext(ctx)
+		}
 	} else {
-		// Apply timeout only for non-streaming requests to prevent H12 timeout on Heroku
-		// Streaming requests use SSE keepalive pings to maintain connection
+		// Apply configured timeout for non-streaming requests
 		if common2.RelayTimeout > 0 {
 			ctx, cancel := context.WithTimeout(req.Context(), time.Duration(common2.RelayTimeout)*time.Second)
 			defer cancel()
