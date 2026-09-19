@@ -513,6 +513,15 @@ func doRequest(c *gin.Context, req *http.Request, info *common.RelayInfo) (*http
 	var pingerDone <-chan struct{}
 	if info.IsStream {
 		helper.SetEventStreamHeaders(c)
+
+		// Send initial ping immediately to establish SSE connection with Heroku
+		// This prevents H12 timeout while waiting for upstream provider response
+		c.Writer.Flush()
+		helper.ExtendWriteDeadline(c)
+		if err := helper.PingData(c); err == nil {
+			c.Writer.Flush()
+		}
+
 		// 处理流式请求的 ping 保活
 		generalSettings := operation_setting.GetGeneralSetting()
 		if generalSettings.PingIntervalEnabled && !info.DisablePing {
