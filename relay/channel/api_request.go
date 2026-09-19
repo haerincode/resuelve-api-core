@@ -473,7 +473,10 @@ func sendPingData(c *gin.Context, mutex *sync.Mutex) error {
 		return err
 	}
 
-	logger.LogDebug(c, "SSE ping data sent")
+	// Flush to Heroku immediately so H15 idle timeout doesn't trigger
+	c.Writer.Flush()
+
+	logger.LogDebug(c, "SSE ping data sent and flushed")
 	return nil
 }
 
