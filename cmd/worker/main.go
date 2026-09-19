@@ -61,6 +61,12 @@ func InitWorkerResources() error {
 		common.SysLog("loading environment from .env file")
 	}
 
+	// Load TLS config before Redis init
+	common.TLSInsecureSkipVerify = common.GetEnvOrDefaultBool("TLS_INSECURE_SKIP_VERIFY", false)
+	if common.TLSInsecureSkipVerify {
+		common.SysLog("TLS_INSECURE_SKIP_VERIFY enabled")
+	}
+
 	// Init database
 	err := model.InitDB()
 	if err != nil {
