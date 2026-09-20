@@ -261,6 +261,12 @@ func updateSunoTasks(ctx context.Context, channelId int, taskIds []string, taskM
 	}
 	if resp.StatusCode != http.StatusOK {
 		logger.LogError(ctx, fmt.Sprintf("Get Task status code: %d", resp.StatusCode))
+		// Don't fail entire batch for transient upstream errors - log and skip this round
+		// Tasks will be retried next polling cycle or hit timeout cleanup
+		if resp.StatusCode >= 500 && resp.StatusCode < 600 {
+			logger.LogWarn(ctx, fmt.Sprintf("渠道 #%d upstream server error %d, will retry next cycle", channelId, resp.StatusCode))
+			return nil // Continue polling other channels
+		}
 		return fmt.Errorf("Get Task status code: %d", resp.StatusCode)
 	}
 	defer resp.Body.Close()
