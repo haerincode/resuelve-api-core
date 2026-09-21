@@ -544,11 +544,8 @@ func doRequest(c *gin.Context, req *http.Request, info *common.RelayInfo) (*http
 		}
 		// Apply timeout to streaming requests to force upstream response before Heroku H12/H15 timeout
 		// Heroku kills connections after 30s (H12) or 55s idle (H15) regardless of SSE keepalive
-		if common2.RelayTimeout > 0 {
-			ctx, cancel := context.WithTimeout(req.Context(), time.Duration(common2.RelayTimeout)*time.Second)
-			defer cancel()
-			req = req.WithContext(ctx)
-		}
+		// DISABLED: No timeout for streaming to allow long-running Claude responses
+		// Context will be canceled when client disconnects or scanner finishes
 	} else {
 		// Apply configured timeout for non-streaming requests
 		if common2.RelayTimeout > 0 {
