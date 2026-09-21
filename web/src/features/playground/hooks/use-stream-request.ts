@@ -17,11 +17,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { SSE } from 'sse.js'
 
 import { getFreshAuthHeaders } from '@/lib/api'
 
 import { API_ENDPOINTS, ERROR_MESSAGES } from '../constants'
+import { FetchSSE } from '../lib/fetch-sse'
 import {
   getStreamReadyStateError,
   isStreamClosedReadyState,
@@ -192,27 +192,15 @@ export function useStreamRequest() {
     controllerRef.current = createStreamRequestController({
       getHeaders: getFreshAuthHeaders,
       createSource: (payload, headers) => {
-        // Fetch con AbortController - sin timeout browser
-        const source = new SSE(API_ENDPOINTS.CHAT_COMPLETIONS, {
+        // Fetch-based SSE sin timeout browser
+        const source = new FetchSSE(API_ENDPOINTS.CHAT_COMPLETIONS, {
           headers: {
             ...headers,
-            'Accept': 'text/event-stream',
-            'Cache-Control': 'no-cache',
+            'Content-Type': 'application/json',
           },
           method: 'POST',
           payload: JSON.stringify(payload),
-          withCredentials: true,
         }) as StreamEventSource
-
-        // Deshabilitar timeout XHR si está disponible
-        try {
-          // @ts-ignore - acceso interno SSE
-          if (source.xhr) {
-            source.xhr.timeout = 0 // Sin timeout
-          }
-        } catch (e) {
-          // Ignorar si no tiene acceso a xhr interno
-        }
 
         return source
       },
