@@ -311,7 +311,10 @@ func StreamScannerHandler(c *gin.Context, resp *http.Response, info *relaycommon
 		logger.LogInfo(c, fmt.Sprintf("stream ended: %s", info.StreamStatus.Summary()))
 	} else {
 		// Cliente desconectó = normal, no error
-		if info.StreamStatus.EndReason == relaycommon.StreamEndReasonClientGone {
+		isClientDisconnect := info.StreamStatus.EndReason == relaycommon.StreamEndReasonClientGone ||
+			(info.StreamStatus.EndError != nil && info.StreamStatus.EndError.Error() == "context canceled")
+
+		if isClientDisconnect {
 			logger.LogDebug(c, fmt.Sprintf("stream ended: %s, received=%d", info.StreamStatus.Summary(), info.ReceivedResponseCount))
 		} else {
 			logger.LogError(c, fmt.Sprintf("stream ended: %s, received=%d", info.StreamStatus.Summary(), info.ReceivedResponseCount))
