@@ -282,7 +282,12 @@ func StreamScannerHandler(c *gin.Context, resp *http.Response, info *relaycommon
 
 		if err := scanner.Err(); err != nil {
 			if err != io.EOF {
-				logger.LogError(c, "scanner error: "+err.Error())
+				// context canceled = cliente desconecta, no error real
+				if err.Error() == "context canceled" {
+					logger.LogDebug(c, "client disconnected: "+err.Error())
+				} else {
+					logger.LogError(c, "scanner error: "+err.Error())
+				}
 				info.StreamStatus.SetEndReason(relaycommon.StreamEndReasonScannerErr, err)
 			}
 		}
