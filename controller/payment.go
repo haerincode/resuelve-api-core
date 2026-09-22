@@ -32,9 +32,15 @@ func InitPaymentServices(flowAPIKey, flowSecret, nowpayAPIKey, nowpayIPNSecret, 
 
 // InitLemonSqueezy initializes Lemon Squeezy payment service
 func InitLemonSqueezy(apiKey, signingSecret, storeID, variantID string) {
+	logger.SysLog(fmt.Sprintf("InitLemonSqueezy called with: apiKey=%s, secret=%s, storeID=%s, variantID=%s",
+		apiKey != "", signingSecret != "", storeID, variantID))
+
 	if apiKey != "" && signingSecret != "" && storeID != "" && variantID != "" {
 		lemonSqueezyService = service.NewLemonSqueezyService(apiKey, signingSecret, storeID, variantID)
 		lemonSqueezyEnabled = true
+		logger.SysLog("LemonSqueezy service initialized successfully")
+	} else {
+		logger.SysLog("LemonSqueezy NOT initialized - missing config")
 	}
 }
 
@@ -84,6 +90,9 @@ func PaymentSelector(c *gin.Context) {
 	pid := c.DefaultQuery("pid", "1000")
 	name := c.DefaultQuery("name", "Recarga")
 	userID := c.DefaultQuery("user_id", "1")
+
+	// Log Lemon Squeezy status for debugging
+	logger.LogInfo(c.Request.Context(), fmt.Sprintf("LemonSqueezy enabled: %v, service: %v", lemonSqueezyEnabled, lemonSqueezyService != nil))
 
 	usdtStatus := "false"
 	if usdtEnabled {
