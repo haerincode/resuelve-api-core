@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -32,15 +33,16 @@ func InitPaymentServices(flowAPIKey, flowSecret, nowpayAPIKey, nowpayIPNSecret, 
 
 // InitLemonSqueezy initializes Lemon Squeezy payment service
 func InitLemonSqueezy(apiKey, signingSecret, storeID, variantID string) {
-	logger.SysLog(fmt.Sprintf("InitLemonSqueezy called with: apiKey=%s, secret=%s, storeID=%s, variantID=%s",
+	ctx := context.Background()
+	logger.LogInfo(ctx, fmt.Sprintf("InitLemonSqueezy called with: apiKey=%v, secret=%v, storeID=%s, variantID=%s",
 		apiKey != "", signingSecret != "", storeID, variantID))
 
 	if apiKey != "" && signingSecret != "" && storeID != "" && variantID != "" {
 		lemonSqueezyService = service.NewLemonSqueezyService(apiKey, signingSecret, storeID, variantID)
 		lemonSqueezyEnabled = true
-		logger.SysLog("LemonSqueezy service initialized successfully")
+		logger.LogInfo(ctx, "LemonSqueezy service initialized successfully")
 	} else {
-		logger.SysLog("LemonSqueezy NOT initialized - missing config")
+		logger.LogInfo(ctx, "LemonSqueezy NOT initialized - missing config")
 	}
 }
 
