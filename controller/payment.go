@@ -1062,8 +1062,8 @@ func LemonSqueezyWebhook(c *gin.Context) {
 		return
 	}
 
-	// Process webhook and create order
-	order, err := lemonSqueezyService.ProcessWebhook(&webhook)
+	// Process webhook and get trade_no
+	tradeNo, err := lemonSqueezyService.ProcessWebhook(&webhook)
 	if err != nil {
 		logger.LogError(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook failed to process: %v", err))
 		c.String(http.StatusBadRequest, "Bad Request")
@@ -1071,7 +1071,6 @@ func LemonSqueezyWebhook(c *gin.Context) {
 	}
 
 	// Use unified TopUp recharge system
-	tradeNo := order.TradeNo
 	alreadyDone, err := model.RechargeEpay(tradeNo, "lemonsqueezy", c.ClientIP())
 	if err != nil {
 		if errors.Is(err, model.ErrTopUpNotFound) {
@@ -1082,7 +1081,7 @@ func LemonSqueezyWebhook(c *gin.Context) {
 	} else if alreadyDone {
 		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook duplicate callback trade_no=%s", tradeNo))
 	} else {
-		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook recharge success trade_no=%s user_id=%d amount=$%.2f", tradeNo, order.UserId, order.Money))
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook recharge success trade_no=%s", tradeNo))
 	}
 
 	c.String(http.StatusOK, "OK")

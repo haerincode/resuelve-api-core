@@ -10,8 +10,6 @@ import (
 	"io"
 	"net/http"
 	"time"
-
-	"github.com/QuantumNous/new-api/model"
 )
 
 const (
@@ -178,15 +176,8 @@ func (s *LemonSqueezyService) IsPaymentConfirmed(status string) bool {
 	return status == "paid"
 }
 
-// ProcessWebhook processes incoming webhook and returns order info
-func (s *LemonSqueezyService) ProcessWebhook(webhook *LemonSqueezyWebhook) (*model.Order, error) {
-	// Extract user_id from custom data
-	userIDFloat, ok := webhook.Meta.CustomData["user_id"].(float64)
-	if !ok {
-		return nil, fmt.Errorf("user_id not found in custom data")
-	}
-	userID := int(userIDFloat)
-
+// ProcessWebhook processes incoming webhook and returns trade_no and user_id
+func (s *LemonSqueezyService) ProcessWebhook(webhook *LemonSqueezyWebhook) (string, error) {
 	// Extract trade_no from custom data
 	tradeNo, ok := webhook.Meta.CustomData["trade_no"].(string)
 	if !ok {
@@ -194,17 +185,5 @@ func (s *LemonSqueezyService) ProcessWebhook(webhook *LemonSqueezyWebhook) (*mod
 		tradeNo = fmt.Sprintf("LS-%s", webhook.Data.ID)
 	}
 
-	// Calculate amount in USD cents
-	amountUSD := float64(webhook.Data.Attributes.TotalUsd) / 100.0
-
-	order := &model.Order{
-		TradeNo:    tradeNo,
-		UserId:     userID,
-		Money:      amountUSD,
-		Status:     "paid",
-		PayMethod:  "lemonsqueezy",
-		CreateTime: time.Now().Unix(),
-	}
-
-	return order, nil
+	return tradeNo, nil
 }
