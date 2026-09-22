@@ -124,6 +124,9 @@ func (s *LemonSqueezyService) CreateCheckout(amountUSD float64, userEmail string
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
+	// Log the request for debugging
+	fmt.Printf("Lemon Squeezy Request: %s\n", string(jsonData))
+
 	httpReq, err := http.NewRequest("POST", LemonSqueezyAPIURL+"/checkouts", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
