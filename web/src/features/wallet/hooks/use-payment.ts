@@ -140,6 +140,15 @@ export function usePayment() {
         if (!isStripe && response.data) {
           const url = (response as unknown as { url?: string }).url
           if (url) {
+            // Lemon Squeezy returns a checkout URL that should be opened directly
+            // Check if it's a Lemon Squeezy URL (contains lemonsqueezy.com)
+            if (url.includes('lemonsqueezy.com')) {
+              window.location.href = url
+              toast.success(i18next.t('Redirecting to payment page...'))
+              return true
+            }
+
+            // For other payment methods (Flow, NOWPayments), use form submission
             submitPaymentForm(url, response.data)
             toast.success(i18next.t('Redirecting to payment page...'))
             return true
