@@ -108,7 +108,7 @@ func (s *LemonSqueezyService) CreateCheckout(amountUSD float64, userEmail string
 	req.Data.Attributes.CustomPrice = amountCents
 	req.Data.Attributes.CheckoutData.Email = userEmail
 	req.Data.Attributes.CheckoutData.Custom = map[string]interface{}{
-		"user_id":  userID,
+		"user_id":  fmt.Sprintf("%d", userID),
 		"trade_no": tradeNo,
 	}
 	req.Data.Attributes.CheckoutOptions.ButtonColor = "#7047EB"
