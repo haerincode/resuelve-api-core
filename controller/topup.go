@@ -335,7 +335,25 @@ func RequestEpay(c *gin.Context) {
 		email = user.Email
 	}
 
-	if strings.Contains(paymentMethod, "usdt") ||
+	if strings.Contains(paymentMethod, "lemonsqueezy") {
+		// Handle Lemon Squeezy payment
+		if !lemonSqueezyEnabled {
+			c.JSON(http.StatusOK, gin.H{"message": "error", "data": "Lemon Squeezy payment not available"})
+			return
+		}
+
+		checkout, err := lemonSqueezyService.CreateCheckout(payMoney, email, id, tradeNo)
+		if err != nil {
+			logger.LogError(c.Request.Context(), fmt.Sprintf("Lemon Squeezy checkout failed: %v", err))
+			c.JSON(http.StatusOK, gin.H{"message": "error", "data": fmt.Sprintf("Error creating checkout: %v", err)})
+			return
+		}
+
+		paymentURL := checkout.Data.Attributes.URL
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Lemon Squeezy order created user_id=%d trade_no=%s amount=%d money=%.2f redirect=%s", id, tradeNo, req.Amount, payMoney, paymentURL))
+
+		c.JSON(http.StatusOK, gin.H{"message": "success", "data": gin.H{"pay_url": paymentURL}, "url": paymentURL})
+	} else if strings.Contains(paymentMethod, "usdt") ||
 		strings.Contains(paymentMethod, "crypto") ||
 		strings.Contains(paymentMethod, "btc") ||
 		strings.Contains(paymentMethod, "eth") {
