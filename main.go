@@ -405,5 +405,13 @@ func InitResources() error {
 		os.Getenv("USDT_ENABLED") == "true",
 	)
 
+	// Initialize Lemon Squeezy payment service
+	controller.InitLemonSqueezy(
+		os.Getenv("LEMONSQUEEZY_API_KEY"),
+		os.Getenv("LEMONSQUEEZY_SIGNING_SECRET"),
+		os.Getenv("LEMONSQUEEZY_STORE_ID"),
+		os.Getenv("LEMONSQUEEZY_VARIANT_ID"),
+	)
+
 	return nil
 }

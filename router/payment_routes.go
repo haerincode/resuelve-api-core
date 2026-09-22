@@ -41,5 +41,8 @@ func SetPaymentRouter(router *gin.Engine) {
 
 		// NOWPayments webhook - NOW FIXED to call RechargeEpay() and credit user balance
 		paymentRoute.POST("/api/nowpayments/notify", controller.NOWPaymentsWebhook)
+
+		// Lemon Squeezy webhook - uses RechargeEpay() to credit user balance
+		paymentRoute.POST("/api/lemonsqueezy/notify", controller.LemonSqueezyWebhook)
 	}
 }

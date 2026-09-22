@@ -18,7 +18,9 @@ import (
 var (
 	flowService         *service.FlowService
 	nowpaymentsService  *service.NOWPaymentsService
+	lemonSqueezyService *service.LemonSqueezyService
 	usdtEnabled         bool
+	lemonSqueezyEnabled bool
 )
 
 // InitPaymentServices initializes payment services with env vars
@@ -26,6 +28,14 @@ func InitPaymentServices(flowAPIKey, flowSecret, nowpayAPIKey, nowpayIPNSecret, 
 	flowService = service.NewFlowService(flowAPIKey, flowSecret, callbackURL, returnURL)
 	nowpaymentsService = service.NewNOWPaymentsService(nowpayAPIKey, nowpayIPNSecret, callbackURL, successURL, cancelURL)
 	usdtEnabled = usdt
+}
+
+// InitLemonSqueezy initializes Lemon Squeezy payment service
+func InitLemonSqueezy(apiKey, signingSecret, storeID, variantID string) {
+	if apiKey != "" && signingSecret != "" && storeID != "" && variantID != "" {
+		lemonSqueezyService = service.NewLemonSqueezyService(apiKey, signingSecret, storeID, variantID)
+		lemonSqueezyEnabled = true
+	}
 }
 
 // PaymentHealth godoc
@@ -41,11 +51,12 @@ func PaymentHealth(c *gin.Context) {
 		"service":   "Resuelve-API Payment Gateway",
 		"timestamp": time.Now().UTC().Format(time.RFC3339),
 		"endpoints": map[string]string{
-			"payment_selector": "/submit.php",
-			"flow_payment":     "/pay/flow",
-			"flow_webhook":     "/api/flow/notify",
-			"crypto_payment":   "/api/nowpayments/create",
-			"crypto_webhook":   "/api/nowpayments/notify",
+			"payment_selector":   "/submit.php",
+			"flow_payment":       "/pay/flow",
+			"flow_webhook":       "/api/flow/notify",
+			"crypto_payment":     "/api/nowpayments/create",
+			"crypto_webhook":     "/api/nowpayments/notify",
+			"lemonsqueezy_webhook": "/api/lemonsqueezy/notify",
 		},
 		"features": map[string]bool{
 			"webpay": true,
@@ -988,6 +999,90 @@ func NOWPaymentsWebhook(c *gin.Context) {
 		logger.LogInfo(c.Request.Context(), fmt.Sprintf("NOWPayments webhook duplicate callback trade_no=%s", tradeNo))
 	} else {
 		logger.LogInfo(c.Request.Context(), fmt.Sprintf("NOWPayments webhook recharge success trade_no=%s", tradeNo))
+	}
+
+	c.String(http.StatusOK, "OK")
+}
+
+// LemonSqueezyWebhook godoc
+// @Summary Lemon Squeezy webhook
+// @Description Handles Lemon Squeezy payment notifications
+// @Tags payment
+// @Accept json
+// @Produce plain
+// @Router /api/lemonsqueezy/notify [post]
+func LemonSqueezyWebhook(c *gin.Context) {
+	if lemonSqueezyService == nil {
+		c.String(http.StatusServiceUnavailable, "Lemon Squeezy not configured")
+		return
+	}
+
+	// Read raw body for signature verification
+	bodyBytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		logger.LogError(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook failed to read body: %v", err))
+		c.String(http.StatusBadRequest, "Bad Request")
+		return
+	}
+
+	// Verify signature
+	signature := c.GetHeader("X-Signature")
+	if !lemonSqueezyService.VerifyWebhookSignature(bodyBytes, signature) {
+		logger.LogError(c.Request.Context(), "Lemon Squeezy webhook invalid signature")
+		model.LogWebhook("lemonsqueezy", "unknown", signature, false, string(bodyBytes), "invalid_signature")
+		c.String(http.StatusUnauthorized, "Invalid signature")
+		return
+	}
+
+	// Parse webhook payload
+	var webhook service.LemonSqueezyWebhook
+	if err := json.Unmarshal(bodyBytes, &webhook); err != nil {
+		logger.LogError(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook failed to parse: %v", err))
+		c.String(http.StatusBadRequest, "Bad Request")
+		return
+	}
+
+	// Log webhook
+	orderID := webhook.Data.ID
+	eventName := webhook.Meta.EventName
+	model.LogWebhook("lemonsqueezy", orderID, signature, true, string(bodyBytes), eventName)
+
+	// Only process order_created and subscription_payment_success events
+	if eventName != "order_created" && eventName != "subscription_payment_success" {
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook ignored event=%s order_id=%s", eventName, orderID))
+		c.String(http.StatusOK, "OK")
+		return
+	}
+
+	// Check if payment is confirmed
+	status := webhook.Data.Attributes.Status
+	if status != "paid" {
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook payment not confirmed status=%s order_id=%s", status, orderID))
+		c.String(http.StatusOK, "OK")
+		return
+	}
+
+	// Process webhook and create order
+	order, err := lemonSqueezyService.ProcessWebhook(&webhook)
+	if err != nil {
+		logger.LogError(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook failed to process: %v", err))
+		c.String(http.StatusBadRequest, "Bad Request")
+		return
+	}
+
+	// Use unified TopUp recharge system
+	tradeNo := order.TradeNo
+	alreadyDone, err := model.RechargeEpay(tradeNo, "lemonsqueezy", c.ClientIP())
+	if err != nil {
+		if errors.Is(err, model.ErrTopUpNotFound) {
+			logger.LogError(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook order not found trade_no=%s error=%q", tradeNo, err.Error()))
+		} else {
+			logger.LogError(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook recharge failed trade_no=%s error=%q", tradeNo, err.Error()))
+		}
+	} else if alreadyDone {
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook duplicate callback trade_no=%s", tradeNo))
+	} else {
+		logger.LogInfo(c.Request.Context(), fmt.Sprintf("Lemon Squeezy webhook recharge success trade_no=%s user_id=%d amount=$%.2f", tradeNo, order.UserId, order.Money))
 	}
 
 	c.String(http.StatusOK, "OK")
