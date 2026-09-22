@@ -31,6 +31,10 @@ func SetPaymentRouter(router *gin.Engine) {
 		paymentRoute.GET("/pay/flow", controller.InitiateFlowPayment)
 		paymentRoute.POST("/pay/flow", controller.InitiateFlowPayment)
 
+		// Lemon Squeezy payment - creates checkout and redirects
+		paymentRoute.GET("/pay/lemonsqueezy", controller.InitiateLemonSqueezyPayment)
+		paymentRoute.POST("/pay/lemonsqueezy", controller.InitiateLemonSqueezyPayment)
+
 		// Flow webhook - NOW FIXED to call RechargeEpay() and credit user balance
 		paymentRoute.POST("/api/flow/notify", controller.FlowWebhook)
 

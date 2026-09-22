@@ -83,10 +83,29 @@ func PaymentSelector(c *gin.Context) {
 	outTradeNo := c.DefaultQuery("out_trade_no", fmt.Sprintf("RA-%d", time.Now().Unix()))
 	pid := c.DefaultQuery("pid", "1000")
 	name := c.DefaultQuery("name", "Recarga")
+	userID := c.DefaultQuery("user_id", "1")
 
 	usdtStatus := "false"
 	if usdtEnabled {
 		usdtStatus = "true"
+	}
+
+	lemonSqueezyStatus := "false"
+	lemonSqueezyDisplay := "display: none;"
+	lemonSqueezyBadge := ""
+	cryptoDividerDisplay := "display: none;"
+	if lemonSqueezyEnabled {
+		lemonSqueezyStatus = "true"
+		lemonSqueezyDisplay = ""
+		cryptoDividerDisplay = ""
+	}
+
+	cryptoDisplay := "display: none;"
+	cryptoBadge := getCryptoBadge(usdtEnabled)
+	cryptoSubtitle := getCryptoSubtitle(usdtEnabled)
+	if usdtEnabled {
+		cryptoDisplay = ""
+		cryptoDividerDisplay = ""
 	}
 
 	html := fmt.Sprintf(`<!DOCTYPE html>
@@ -542,6 +561,13 @@ func PaymentSelector(c *gin.Context) {
 
       <div class="divider"><span>o</span></div>
 
+      <div class="payment-option" onclick="pagarLemonSqueezy()" id="lemonSqueezyOption" style="%s">
+        <div class="payment-title"><span class="payment-icon">🌎</span>Pagar con tarjeta internacional%s</div>
+        <div class="payment-subtitle">Visa, Mastercard, American Express • Pagos en USD con cualquier tarjeta del mundo</div>
+      </div>
+
+      <div class="divider" id="cryptoDivider" style="%s"><span>o</span></div>
+
       <div class="payment-option usdt" onclick="pagarUsdt()" id="cryptoOption" style="%s">
         <div class="payment-title"><span class="payment-icon">💵</span>Pagar con criptomonedas%s</div>
         <div class="payment-subtitle">USDT, USDC y más%s</div>
@@ -578,6 +604,7 @@ func PaymentSelector(c *gin.Context) {
 
   <script>
     const USDT_ENABLED = %s;
+    const LEMONSQUEEZY_ENABLED = %s;
     const emailInput = document.getElementById('clientEmail');
     const emailSection = document.getElementById('emailSection');
     const errorMessage = document.getElementById('errorMessage');
@@ -622,6 +649,37 @@ func PaymentSelector(c *gin.Context) {
         pid: '%s',
         name: '%s',
         email: email
+      };
+
+      for (const [key, value] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+
+    function pagarLemonSqueezy() {
+      if (!LEMONSQUEEZY_ENABLED) return;
+
+      const email = getValidatedEmail();
+      if (!email) return;
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/pay/lemonsqueezy';
+
+      const fields = {
+        money: '%s',
+        out_trade_no: '%s',
+        pid: '%s',
+        name: '%s',
+        email: email,
+        user_id: '%s'
       };
 
       for (const [key, value] of Object.entries(fields)) {
@@ -706,12 +764,13 @@ func PaymentSelector(c *gin.Context) {
     }
   </script>
 </body>
-</html>`, money,
-		getCryptoStyle(usdtEnabled),
-		getCryptoBadge(usdtEnabled),
-		getCryptoSubtitle(usdtEnabled),
-		usdtStatus,
+</html>`,
+		lemonSqueezyDisplay, lemonSqueezyBadge,
+		cryptoDividerDisplay,
+		cryptoDisplay, cryptoBadge, cryptoSubtitle,
+		usdtStatus, lemonSqueezyStatus,
 		money, outTradeNo, pid, name,
+		money, outTradeNo, pid, name, userID,
 		money, outTradeNo, pid, name)
 
 	c.Header("Content-Type", "text/html; charset=utf-8")
@@ -778,6 +837,54 @@ func InitiateFlowPayment(c *gin.Context) {
 
 	// Redirect to Flow
 	c.Redirect(http.StatusFound, flowURL)
+}
+
+// InitiateLemonSqueezyPayment godoc
+// @Summary Initiate Lemon Squeezy payment
+// @Description Create Lemon Squeezy checkout and redirect to payment page
+// @Tags payment
+// @Param money formData float64 true "Amount in USD"
+// @Param out_trade_no formData string false "Order ID"
+// @Param email formData string false "Customer email"
+// @Param user_id formData int true "User ID"
+// @Produce json
+// @Success 302
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /pay/lemonsqueezy [post]
+func InitiateLemonSqueezyPayment(c *gin.Context) {
+	if lemonSqueezyService == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Lemon Squeezy not configured"})
+		return
+	}
+
+	money := c.DefaultPostForm("money", "0")
+	outTradeNo := c.DefaultPostForm("out_trade_no", fmt.Sprintf("LS-%d", time.Now().Unix()))
+	email := c.DefaultPostForm("email", "")
+	userIDStr := c.PostForm("user_id")
+
+	amountUSD, err := strconv.ParseFloat(money, 64)
+	if err != nil || amountUSD <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid amount"})
+		return
+	}
+
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil || userID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id"})
+		return
+	}
+
+	// Create checkout with Lemon Squeezy
+	checkout, err := lemonSqueezyService.CreateCheckout(amountUSD, email, userID, outTradeNo)
+	if err != nil {
+		logger.LogError(c.Request.Context(), fmt.Sprintf("Lemon Squeezy checkout failed: %v", err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create checkout"})
+		return
+	}
+
+	// Redirect to Lemon Squeezy checkout
+	c.Redirect(http.StatusFound, checkout.Data.Attributes.URL)
 }
 
 // FlowWebhook godoc
