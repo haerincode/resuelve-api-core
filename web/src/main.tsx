@@ -38,6 +38,7 @@ import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
+import { getFreshAuthHeaders } from './lib/api'
 import './i18n/config'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
@@ -203,9 +204,13 @@ function setUpVerb() {
 
   const getSessionToken = async (): Promise<string | null> => {
     try {
+      // Get auth headers using the app's auth system
+      const authHeaders = await getFreshAuthHeaders()
+
       const response = await fetch('/api/verb-token', {
         credentials: 'same-origin',
-        cache: 'no-store'
+        cache: 'no-store',
+        headers: authHeaders
       })
 
       if (!response.ok) {
