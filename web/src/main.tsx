@@ -206,7 +206,7 @@ function setUpVerb() {
     try {
       const headers = await getFreshAuthHeaders()
 
-      if (!headers) {
+      if (!headers.Authorization) {
         return null
       }
 
