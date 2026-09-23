@@ -34,6 +34,7 @@ import { applyFaviconToDom } from '@/lib/dom-utils'
 import '@/lib/dayjs'
 import { initializeFrontendCache } from '@/lib/frontend-cache'
 import { handleServerError } from '@/lib/handle-server-error'
+import '@/lib/verb-adapter' // Initialize Verb adapter
 
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'

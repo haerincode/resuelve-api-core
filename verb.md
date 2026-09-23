@@ -11,197 +11,268 @@ Este asistente puede ayudarte con tu cuenta de Resuelve API, tokens, canales, lo
 Obtener información de la cuenta del usuario actual incluyendo saldo, grupo, email y cuota disponible. Call this when the user asks about their account, balance, quota, group membership, or personal information.
 
 - classification: read
-- run: browser
-- method: GET
-- path: /api/user/self
+- run: adapter
 - group: usuario
+
+```js
+const res = await api.get('/api/user/self')
+return res.data
+```
 
 ## get_user_models
 
 Listar todos los modelos de IA que el usuario puede usar según su grupo y permisos. Call this when the user asks what AI models they can access, which models are available to them, or wants to know their model permissions.
 
 - classification: read
-- run: browser
-- method: GET
-- path: /api/user/models
+- run: adapter
 - group: usuario
+
+```js
+const res = await api.get('/api/user/models')
+return res.data
+```
 
 ## list_tokens
 
 Listar todos los tokens de API del usuario con sus nombres, cuotas y estado. Call this when the user asks to see their API keys, list their tokens, or wants to know what tokens they have created.
 
 - classification: read
-- run: browser
-- method: GET
-- path: /api/token/
+- run: adapter
 - group: tokens
 
-### Arguments
-
-- `p` (integer, optional, min 1) Número de página para paginación, por defecto 1
-- `size` (integer, optional, min 1, max 100) Cantidad de tokens por página, por defecto 10
-
-## get_token
-
-Obtener detalles completos de un token específico por su ID numérico. Call this when the user asks about a specific token they know by ID or wants detailed information about one token.
-
-- classification: read
-- run: browser
-- method: GET
-- path: /api/token/{token_id}
-- group: tokens
-
-### Arguments
-
-- `token_id` (integer, required) El ID del token, como aparece en la lista de tokens
+```js
+const res = await api.get('/api/token/')
+return res.data
+```
 
 ## create_token
 
-Crear un nuevo token de API con nombre, cuota y fecha de expiración opcionales. Call this when the user wants to generate a new API key, create a token, or needs a new access credential.
+Crear un nuevo token de API con nombre y cuota límite especificados. Call this when the user wants to create a new API key, generate a token, or needs a new access token for their applications.
 
 - classification: write
-- run: browser
-- method: POST
-- path: /api/token/
-- confirm: "¿Crear nuevo token '{name}'?"
+- run: adapter
 - group: tokens
 
-### Arguments
+### Parameters
 
-- `name` (string, required, max 50) Nombre descriptivo para el token
-- `remain_quota` (integer, optional, min -1) Cuota asignada al token (-1 = ilimitado), por defecto ilimitado
-- `expired_time` (integer, optional, min -1) Timestamp de expiración (-1 = nunca expira), por defecto nunca expira
-- `unlimited_quota` (boolean, optional) Si el token tiene cuota ilimitada, por defecto true
+- name (string, required): Nombre descriptivo para identificar el token
+- remain_quota (integer, optional): Cuota límite del token (0 = sin límite si el usuario es admin)
+- expired_time (integer, optional): Timestamp de expiración (-1 = sin expiración)
+- unlimited_quota (boolean, optional): Si es true, el token no tiene límite de cuota
 
-## update_token
+```js
+const res = await api.post('/api/token/', {
+  name: params.name,
+  remain_quota: params.remain_quota,
+  expired_time: params.expired_time,
+  unlimited_quota: params.unlimited_quota
+})
+return res.data
+```
 
-Actualizar nombre, cuota o fecha de expiración de un token existente. Call this when the user wants to modify, rename, change the quota of, or extend the expiration of an existing token.
+## update_token_status
 
-- classification: write
-- run: browser
-- method: PUT
-- path: /api/token/
-- confirm: "¿Actualizar token '{name}'?"
+Habilitar o deshabilitar un token de API existente. Call this when the user wants to enable, disable, activate or deactivate an API key.
+
+- classification: write  
+- run: adapter
 - group: tokens
 
-### Arguments
+### Parameters
 
-- `id` (integer, required) ID del token a actualizar
-- `name` (string, required, max 50) Nuevo nombre del token
-- `remain_quota` (integer, optional, min -1) Nueva cuota (-1 = ilimitado)
-- `expired_time` (integer, optional, min -1) Nuevo timestamp de expiración (-1 = nunca expira)
-- `unlimited_quota` (boolean, optional) Si el token tiene cuota ilimitada
+- id (integer, required): ID del token a modificar
+- status (integer, required): Nuevo estado (1 = habilitado, 2 = deshabilitado)
+
+```js
+const res = await api.put(`/api/token/status/${params.id}`, {
+  status: params.status
+})
+return res.data
+```
 
 ## delete_token
 
-Eliminar permanentemente un token de API, revocando su acceso de inmediato. Call this only when the user explicitly asks to delete, remove, or revoke a specific token.
+Eliminar permanentemente un token de API. Call this when the user wants to delete, remove or revoke an API token.
 
-- classification: destructive
-- run: browser
-- method: DELETE
-- path: /api/token/{token_id}
-- confirm: "¿Eliminar token ID {token_id}? Esta acción no se puede deshacer."
+- classification: write
+- run: adapter
 - group: tokens
 
-### Arguments
+### Parameters
 
-- `token_id` (integer, required) ID del token a eliminar
+- id (integer, required): ID del token a eliminar
 
-## get_usage_logs
+```js
+const res = await api.delete(`/api/token/${params.id}`)
+return res.data
+```
 
-Obtener el historial detallado de llamadas a la API con timestamps, modelos usados y costos. Call this when the user asks about their API usage history, wants to see which models they've used, or needs to review past API calls.
+## get_user_dashboard
 
-- classification: read
-- run: browser
-- method: GET
-- path: /api/log/self
-- group: logs
-
-### Arguments
-
-- `p` (integer, optional, min 1) Número de página, por defecto 1
-- `size` (integer, optional, min 1, max 100) Cantidad de logs por página, por defecto 10
-- `type` (integer, optional, one of: 1, 2) Tipo de log (1=consumo, 2=recargas)
-- `start_timestamp` (integer, optional, min 0) Timestamp de inicio del rango de fechas
-- `end_timestamp` (integer, optional, min 0) Timestamp de fin del rango de fechas
-- `model_name` (string, optional, max 100) Filtrar por nombre del modelo (ej: claude-opus-5-20241022)
-- `token_name` (string, optional, max 100) Filtrar por nombre del token
-
-## get_usage_stats
-
-Obtener estadísticas agregadas de consumo incluyendo cuota total usada, RPM y TPM. Call this when the user asks how much they've spent, wants a summary of their usage, or needs aggregate consumption statistics.
+Obtener estadísticas de uso general del usuario: cuota usada hoy, total de peticiones y gasto por modelo. Call this when the user wants to see their usage statistics, dashboard overview, or spending breakdown by model.
 
 - classification: read
-- run: browser
-- method: GET
-- path: /api/log/self/stat
+- run: adapter
+- group: usuario
+
+### Parameters
+
+- start_timestamp (integer, optional): Timestamp inicio del rango de fechas
+- end_timestamp (integer, optional): Timestamp fin del rango de fechas
+
+```js
+const params = new URLSearchParams()
+if (args.start_timestamp) params.append('start_timestamp', args.start_timestamp)
+if (args.end_timestamp) params.append('end_timestamp', args.end_timestamp)
+const res = await api.get(`/api/user/dashboard?${params}`)
+return res.data
+```
+
+## list_channels
+
+Listar todos los canales (upstreams) configurados con su estado de conexión y modelos disponibles. Call this when the user wants to see their configured channels, upstream providers, or check channel status.
+
+- classification: read
+- run: adapter
+- group: canales
+
+```js
+const res = await api.get('/api/channel/')
+return res.data
+```
+
+## get_channel_models
+
+Obtener lista de modelos disponibles en un canal específico mediante test de conectividad. Call this when the user wants to check what models are available on a specific channel or test channel connectivity.
+
+- classification: read
+- run: adapter
+- group: canales
+
+### Parameters
+
+- id (integer, required): ID del canal a consultar
+
+```js
+const res = await api.get(`/api/channel/models/${params.id}`)
+return res.data
+```
+
+## test_channel
+
+Probar conectividad de un canal enviando una petición de prueba. Call this when the user wants to test if a channel is working properly or verify channel connectivity.
+
+- classification: write
+- run: adapter
+- group: canales
+
+### Parameters
+
+- id (integer, required): ID del canal a probar
+- model (string, required): Modelo a usar en la prueba
+
+```js
+const res = await api.get(`/api/channel/test/${params.id}/${params.model}`)
+return res.data
+```
+
+## update_channel_status
+
+Habilitar o deshabilitar un canal upstream. Call this when the user wants to enable, disable, activate or deactivate a channel.
+
+- classification: write
+- run: adapter
+- group: canales
+
+### Parameters
+
+- id (integer, required): ID del canal a modificar
+- status (integer, required): Nuevo estado (1 = habilitado, 2 = deshabilitado)
+
+```js
+const res = await api.put(`/api/channel/status/${params.id}`, {
+  status: params.status
+})
+return res.data
+```
+
+## get_logs
+
+Obtener logs de peticiones del usuario con detalles de uso, modelo utilizado y tokens consumidos. Call this when the user wants to see their request history, usage logs, or track their API calls.
+
+- classification: read
+- run: adapter
 - group: logs
 
-### Arguments
+### Parameters
 
-- `type` (integer, optional, one of: 1, 2) Tipo de log (1=consumo, 2=recargas)
-- `start_timestamp` (integer, optional, min 0) Timestamp de inicio del rango
-- `end_timestamp` (integer, optional, min 0) Timestamp de fin del rango
-- `model_name` (string, optional, max 100) Filtrar por modelo
-- `token_name` (string, optional, max 100) Filtrar por token
+- p (integer, optional): Número de página
+- page_size (integer, optional): Cantidad de logs por página (default 10)
+- token_name (string, optional): Filtrar por nombre de token
+- model_name (string, optional): Filtrar por nombre de modelo
+- start_timestamp (integer, optional): Timestamp inicio del rango
+- end_timestamp (integer, optional): Timestamp fin del rango
+- channel (integer, optional): ID del canal upstream
 
-### Returns
-
-Retorna estadísticas con cuota usada, RPM y TPM del período especificado.
+```js
+const params = new URLSearchParams()
+if (args.p) params.append('p', args.p)
+if (args.page_size) params.append('page_size', args.page_size)
+if (args.token_name) params.append('token_name', args.token_name)
+if (args.model_name) params.append('model_name', args.model_name)
+if (args.start_timestamp) params.append('start_timestamp', args.start_timestamp)
+if (args.end_timestamp) params.append('end_timestamp', args.end_timestamp)
+if (args.channel) params.append('channel', args.channel)
+const res = await api.get(`/api/log/?${params}`)
+return res.data
+```
 
 ## get_topup_info
 
-Obtener lista de métodos de pago disponibles, montos mínimos y opciones de recarga. Call this when the user asks how to add balance, what payment methods are available, minimum recharge amounts, or needs information about topping up their account.
+Obtener configuración de métodos de pago habilitados y montos mínimos para recargas. Call this when the user asks what payment methods are available, minimum topup amounts, or wants to see payment options.
 
 - classification: read
-- run: browser
-- method: GET
-- path: /api/user/topup/info
+- run: adapter
 - group: recargas
 
-### Returns
+```js
+const res = await api.get('/api/user/topup/info')
+return res.data
+```
 
-Retorna métodos de pago disponibles (Webpay, Flow, Stripe, USDT), montos mínimos y opciones de recarga.
+## get_topup_history
 
-## get_user_topups
-
-Listar el historial completo de recargas y pagos realizados por el usuario. Call this when the user asks about their payment history, past recharges, or wants to see their transaction records.
+Obtener historial de recargas del usuario con montos, métodos de pago y estado. Call this when the user wants to see their recharge history, payment history, or past transactions.
 
 - classification: read
-- run: browser
-- method: GET
-- path: /api/user/topup/self
+- run: adapter
 - group: recargas
 
-### Arguments
+### Parameters
 
-- `p` (integer, optional, min 1) Número de página
-- `size` (integer, optional, min 1, max 100) Cantidad de recargas por página
+- p (integer, optional): Número de página
+- page_size (integer, optional): Cantidad de registros por página
 
-## get_quota_dates
-
-Obtener datos de consumo diario desglosados por fecha para análisis histórico. Call this when the user wants to see their daily usage, analyze consumption patterns over time, or needs historical usage data.
-
-- classification: read
-- run: browser
-- method: GET
-- path: /api/data/self
-- group: datos
-
-### Arguments
-
-- `start_timestamp` (integer, optional, min 0) Timestamp de inicio
-- `end_timestamp` (integer, optional, min 0) Timestamp de fin
+```js
+const params = new URLSearchParams()
+if (args.p) params.append('p', args.p)
+if (args.page_size) params.append('page_size', args.page_size)
+const res = await api.get(`/api/user/topup?${params}`)
+return res.data
+```
 
 ## get_status
 
-Obtener configuración general del sistema incluyendo versión, métodos de autenticación y estado del servicio. Call this when the user asks about system status, service availability, what OAuth providers are enabled, or general platform configuration.
+Obtener estado general del sistema y configuración pública. Call this when the user wants to know system status, available features, or platform configuration.
 
 - classification: read
-- run: browser
-- method: GET
-- path: /api/status
+- run: adapter
 - group: sistema
+
+```js
+const res = await api.get('/api/status')
+return res.data
+```
 
 ### Returns
 
@@ -212,10 +283,13 @@ Retorna información sobre versión, métodos de autenticación disponibles (OAu
 Obtener tarifas actuales por millón de tokens para todos los modelos disponibles. Call this when the user asks how much a model costs, wants to see pricing per token, or needs to compare model costs.
 
 - classification: read
-- run: browser
-- method: GET
-- path: /api/pricing
+- run: adapter
 - group: sistema
+
+```js
+const res = await api.get('/api/pricing')
+return res.data
+```
 
 ### Returns
 
@@ -226,10 +300,13 @@ Retorna los precios por millón de tokens de entrada y salida para cada modelo d
 Listar todos los modelos de IA del catálogo completo de la plataforma con sus proveedores. Call this when the user wants to see all available models across the platform, including Claude, GPT, Gemini and other AI models in the catalog.
 
 - classification: read
-- run: browser
-- method: GET
-- path: /api/models
+- run: adapter
 - group: sistema
+
+```js
+const res = await api.get('/api/models')
+return res.data
+```
 
 ### Returns
 
