@@ -39,6 +39,7 @@ import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
 import { getFreshAuthHeaders } from './lib/auth-session'
+import { useAuthStore } from './stores/auth-store'
 import './i18n/config'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
@@ -205,11 +206,19 @@ function setUpVerb() {
   const getSessionToken = async (): Promise<string | null> => {
     try {
       console.log('[Verb] Getting session token...')
+
+      // Check if user is logged in before attempting refresh
+      const auth = useAuthStore.getState().auth
+      if (!auth.user || !auth.session) {
+        console.log('[Verb] User not logged in, returning null')
+        return null
+      }
+
       const headers = await getFreshAuthHeaders()
       console.log('[Verb] Headers:', { hasAuth: !!headers.Authorization })
 
       if (!headers.Authorization) {
-        console.log('[Verb] No Authorization header, user not logged in')
+        console.log('[Verb] No Authorization header after refresh')
         return null
       }
 
