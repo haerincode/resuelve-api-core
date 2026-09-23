@@ -38,7 +38,6 @@ import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
-import { useAuthStore } from './stores/auth-store'
 import './i18n/config'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
@@ -204,32 +203,19 @@ function setUpVerb() {
 
   const getSessionToken = async (): Promise<string | null> => {
     try {
-      // Get the current access token from auth store
-      const accessToken = useAuthStore.getState().auth.accessToken
-
-      if (!accessToken) {
-        // Not signed in
-        return null
-      }
-
+      // Just use fetch with credentials - cookies are sent automatically
       const response = await fetch('/api/verb-token', {
-        credentials: 'same-origin',
-        cache: 'no-store',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
+        credentials: 'include',
+        cache: 'no-store'
       })
 
       if (!response.ok) {
-        // Failed to fetch - return null (unknown state, don't reset)
-        console.error('Verb token fetch failed:', response.status, response.statusText)
+        console.error('Verb token fetch failed:', response.status, await response.text())
         return null
       }
 
       const data = await response.json()
-      // data.token is null when signed out, string when signed in
-      return data.token
+      return data.token || null
     } catch (error) {
       // Network error or auth error - return null (unknown state, don't reset)
       console.error('Verb token fetch failed:', error)
