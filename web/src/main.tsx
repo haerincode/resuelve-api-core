@@ -38,7 +38,7 @@ import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
-import { useAuthStore } from './stores/auth-store'
+import { getFreshAuthHeaders } from './lib/auth-session'
 import './i18n/config'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
@@ -204,21 +204,16 @@ function setUpVerb() {
 
   const getSessionToken = async (): Promise<string | null> => {
     try {
-      // Get the access token directly from the store at call time
-      const accessToken = useAuthStore.getState().auth?.accessToken
+      const headers = await getFreshAuthHeaders()
 
-      if (!accessToken) {
-        // Not signed in
+      if (!headers) {
         return null
       }
 
-      // Make request with Authorization header
       const response = await fetch('/api/verb-token', {
         credentials: 'include',
         cache: 'no-store',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
+        headers
       })
 
       if (!response.ok) {
