@@ -204,27 +204,34 @@ function setUpVerb() {
 
   const getSessionToken = async (): Promise<string | null> => {
     try {
+      console.log('[Verb] Getting session token...')
       const headers = await getFreshAuthHeaders()
+      console.log('[Verb] Headers:', { hasAuth: !!headers.Authorization })
 
       if (!headers.Authorization) {
+        console.log('[Verb] No Authorization header, user not logged in')
         return null
       }
 
+      console.log('[Verb] Fetching verb token from /api/verb-token')
       const response = await fetch('/api/verb-token', {
         credentials: 'include',
         cache: 'no-store',
         headers
       })
 
+      console.log('[Verb] Response status:', response.status)
       if (!response.ok) {
-        console.error('Verb token fetch failed:', response.status)
+        const text = await response.text()
+        console.error('[Verb] Token fetch failed:', response.status, text)
         return null
       }
 
       const data = await response.json()
+      console.log('[Verb] Token received:', { hasToken: !!data.token })
       return data.token || null
     } catch (error) {
-      console.error('Verb token fetch error:', error)
+      console.error('[Verb] Token fetch error:', error)
       return null
     }
   }
