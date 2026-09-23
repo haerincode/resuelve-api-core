@@ -38,7 +38,7 @@ import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
-import { api } from './lib/api'
+import { useAuthStore } from './stores/auth-store'
 import './i18n/config'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
@@ -204,14 +204,32 @@ function setUpVerb() {
 
   const getSessionToken = async (): Promise<string | null> => {
     try {
-      // Use the app's axios instance that already handles auth
-      const response = await api.get('/api/verb-token')
+      // Get the current access token from auth store
+      const accessToken = useAuthStore.getState().auth.accessToken
 
-      if (response.data && response.data.token !== undefined) {
-        return response.data.token
+      if (!accessToken) {
+        // Not signed in
+        return null
       }
 
-      return null
+      const response = await fetch('/api/verb-token', {
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        // Failed to fetch - return null (unknown state, don't reset)
+        console.error('Verb token fetch failed:', response.status, response.statusText)
+        return null
+      }
+
+      const data = await response.json()
+      // data.token is null when signed out, string when signed in
+      return data.token
     } catch (error) {
       // Network error or auth error - return null (unknown state, don't reset)
       console.error('Verb token fetch failed:', error)
