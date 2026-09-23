@@ -98,7 +98,7 @@ export async function executeLogout(
 
 // User logout
 export async function logout(): Promise<ApiResponse> {
-  return executeLogout({
+  const result = await executeLogout({
     getExpectedSID: () => useAuthStore.getState().auth.session?.sid,
     request: async (sid) => {
       const res = await api.post('/api/user/auth/logout', undefined, {
@@ -110,6 +110,13 @@ export async function logout(): Promise<ApiResponse> {
     },
     refresh: refreshAuthentication,
   })
+
+  // Reset Verb widget on sign-out to clear conversation and cached identity
+  if (window.Verb) {
+    window.Verb.reset()
+  }
+
+  return result
 }
 
 // ----------------------------------------------------------------------------

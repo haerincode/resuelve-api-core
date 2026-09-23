@@ -38,7 +38,6 @@ import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
-import { TawkChat } from './components/tawk-chat'
 import './i18n/config'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
@@ -177,11 +176,66 @@ if (!rootElement.innerHTML) {
           <FontProvider>
             <DirectionProvider>
               <RouterProvider router={router} />
-              <TawkChat />
             </DirectionProvider>
           </FontProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </StrictMode>
   )
+}
+
+// ============================================================================
+// Verb AI Assistant Identity Integration
+// ============================================================================
+
+declare global {
+  interface Window {
+    Verb?: {
+      configure: (config: { getSessionToken: () => Promise<string | null> }) => void
+      identify: (token: string) => void
+      reset: () => void
+    }
+  }
+}
+
+function setUpVerb() {
+  if (!window.Verb) return
+
+  const getSessionToken = async (): Promise<string | null> => {
+    try {
+      const response = await fetch('/api/verb-token', {
+        credentials: 'same-origin',
+        cache: 'no-store'
+      })
+
+      if (!response.ok) {
+        // Failed to fetch - return null (unknown state, don't reset)
+        return null
+      }
+
+      const data = await response.json()
+      // data.token is null when signed out, string when signed in
+      return data.token
+    } catch (error) {
+      // Network error - return null (unknown state, don't reset)
+      console.error('Verb token fetch failed:', error)
+      return null
+    }
+  }
+
+  window.Verb.configure({ getSessionToken })
+
+  // Initial identify
+  getSessionToken().then((token) => {
+    if (token) window.Verb!.identify(token)
+  }).catch((error) => {
+    console.error('Verb initial identify failed:', error)
+  })
+}
+
+// Wait for Verb widget to load (script tag is deferred)
+if (window.Verb) {
+  setUpVerb()
+} else {
+  window.addEventListener('verb:ready', setUpVerb)
 }
