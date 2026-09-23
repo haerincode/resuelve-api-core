@@ -38,7 +38,7 @@ import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
-import { getFreshAuthHeaders } from './lib/api'
+import { api } from './lib/api'
 import './i18n/config'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
@@ -204,25 +204,16 @@ function setUpVerb() {
 
   const getSessionToken = async (): Promise<string | null> => {
     try {
-      // Get auth headers using the app's auth system
-      const authHeaders = await getFreshAuthHeaders()
+      // Use the app's axios instance that already handles auth
+      const response = await api.get('/api/verb-token')
 
-      const response = await fetch('/api/verb-token', {
-        credentials: 'same-origin',
-        cache: 'no-store',
-        headers: authHeaders
-      })
-
-      if (!response.ok) {
-        // Failed to fetch - return null (unknown state, don't reset)
-        return null
+      if (response.data && response.data.token !== undefined) {
+        return response.data.token
       }
 
-      const data = await response.json()
-      // data.token is null when signed out, string when signed in
-      return data.token
+      return null
     } catch (error) {
-      // Network error - return null (unknown state, don't reset)
+      // Network error or auth error - return null (unknown state, don't reset)
       console.error('Verb token fetch failed:', error)
       return null
     }
