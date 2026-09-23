@@ -38,7 +38,7 @@ import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
-import { api } from './lib/api'
+import { useAuthStore } from './stores/auth-store'
 import './i18n/config'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
@@ -204,9 +204,30 @@ function setUpVerb() {
 
   const getSessionToken = async (): Promise<string | null> => {
     try {
-      // Use the app's axios instance - it automatically adds Authorization header
-      const response = await api.get('/api/verb-token')
-      return response.data?.token || null
+      // Get the access token directly from the store at call time
+      const accessToken = useAuthStore.getState().auth?.accessToken
+
+      if (!accessToken) {
+        // Not signed in
+        return null
+      }
+
+      // Make request with Authorization header
+      const response = await fetch('/api/verb-token', {
+        credentials: 'include',
+        cache: 'no-store',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      })
+
+      if (!response.ok) {
+        console.error('Verb token fetch failed:', response.status)
+        return null
+      }
+
+      const data = await response.json()
+      return data.token || null
     } catch (error) {
       console.error('Verb token fetch error:', error)
       return null
